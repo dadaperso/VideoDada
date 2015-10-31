@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Res1</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_film">FilmActivity</string>
+    <string name="action_search">Search</string>
+    <string name="title_activity_detail_item">DetailItemActivity</string>
+    <string name="locdvd_resumer">Synopsis</string>
+    <string name="locdvd_actor">Actor: </string>
+    <string name="locdvd_titre_ba_bo">SoundTrack and Trailer</string>
+    <string name="locdvd_ba">Trailer</string>
+    <string name="locdvd_bo">SoundTrack</string>
+    <string name="locdvd_memo">Memo</string>
+    <string name="locdvd_memo_rec">Record</string>
+    <string name="locdvd_memo_play">Play</string>
+    <string name="locdvd_memo_del">Delete</string>
+    <string name="locdvd_rental">DVD Rental</string>
+</resources>
