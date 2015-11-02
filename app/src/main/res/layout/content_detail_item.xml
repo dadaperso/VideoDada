@@ -114,7 +114,8 @@
                 android:text="@string/locdvd_actor"
                 android:textColor="#FF00CC"
                 android:textSize="18sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:id="@+id/txtActorLabel"/>
 
         </LinearLayout>
 

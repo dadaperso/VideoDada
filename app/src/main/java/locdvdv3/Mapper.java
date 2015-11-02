@@ -1,9 +1,11 @@
 package locdvdv3;
 
+import java.io.Serializable;
+
 /**
  * Created by dada on 26/10/2015.
  */
-public class Mapper {
+public class Mapper implements Serializable{
 
     private int id;
     private String type;

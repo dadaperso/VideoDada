@@ -32,6 +32,8 @@ public class DataConstruction extends Activity {
 
         api.updateSummary();
 
+        api.updateActor();
+
         databaseMedia.close();
 
     }

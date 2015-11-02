@@ -44,6 +44,7 @@ public class API
     public static final String TAG_SEASON = "season";
     public static final String TAG_EPISODE = "episode";
     public static final String TAG_SUMMARY = "summary";
+    public static final String TAG_ACTOR = "actor";
 
 
     //TODO create table for listing all field of tables DB
@@ -72,6 +73,7 @@ public class API
         String[] episode = {TAG_EPISODE, "int"};
         String[] tvShow = {TAG_TV_SHOW, "object"};
         String[] summary = {TAG_SUMMARY, "string"};
+        String[] actor = {TAG_ACTOR, "string"};
 
 
         String[][] movieFields = {id, mapper, title, tagLine,
@@ -88,6 +90,11 @@ public class API
 
         String[][] summaryFields = {id , mapper, summary, createDate, modifyDate};
         fieldsTables.put(TAG_SUMMARY, summaryFields);
+
+        String[][] actorFields = {id , mapper, actor, createDate, modifyDate};
+        fieldsTables.put(TAG_ACTOR, actorFields);
+
+
     }
 
     public void updateMovie(){
@@ -101,6 +108,10 @@ public class API
 
     public void updateSummary(){
         new GetData(TAG_SUMMARY).execute();
+    }
+
+    public void updateActor() {
+        new GetData(TAG_ACTOR).execute();
     }
 
     /**
@@ -141,6 +152,8 @@ public class API
             if (lastUpdate != null){
                 urlQuery+= "&lastUpdate="+lastUpdate;
             }
+            Log.d("Query: ", "> "+urlQuery);
+
             String jsonStr = sh.makeServiceCall(urlQuery, ServiceHandler.GET);
 
             Log.d("Response: ", "> " + jsonStr);

@@ -1,6 +1,7 @@
 package com.example.dada.res1;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -18,15 +19,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
+import locdvdv3.Actor;
+import locdvdv3.DatabaseMedia;
 import locdvdv3.Movie;
 
 public class DetailItemActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     // TODO create getActorByMovie to get actors on this Movie
-    String[] lsActor = {"Actor 1", "Actor 2", "Actor 3", "Actor 4",
-            "Actor 1", "Actor 2", "Actor 3", "Actor 4",
-            "Actor 1", "Actor 2", "Actor 3", "Actor 4"};
+    ArrayList<Actor> lsActor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +71,8 @@ public class DetailItemActivity extends AppCompatActivity
 
         final LinearLayout actorGroup = (LinearLayout) findViewById(R.id.actorGroup);
 
+        lsActor = DatabaseMedia.getInstance(this).getActorsByMovie(movie.getMapper());
+
         actorGroup.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
             @SuppressLint("NewApi")
@@ -92,14 +97,24 @@ public class DetailItemActivity extends AppCompatActivity
                 int width = 0;
                 int i = 0;
                 // Here you can get the size :)
-                for (String actor : lsActor){
+                // TODO resize actorGroup on click on txtActorLabel
+                for (final Actor actor : lsActor){
                     i++;
                     TextView txtActor = new TextView(DetailItemActivity.this);
+                    txtActor.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(DetailItemActivity.this,ActorActivity.class);
+                            intent.putExtra("actor", actor);
+                            startActivity(intent);
+                        }
+                    });
 
-                    if (i < lsActor.length){
+                    if (i < lsActor.size()){
                        txtActor.setText(actor+ ", ");
+
                    }else {
-                       txtActor.setText(actor);
+                       txtActor.setText(actor.toString());
                    }
 
                     txtActor.measure(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -112,7 +127,7 @@ public class DetailItemActivity extends AppCompatActivity
                         layout.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                         parentLayout = layout;
                         actorGroup.addView(parentLayout);
-                        width = 0;
+                        width = txtActor.getMeasuredWidth();
                     }
 
                     parentLayout.addView(txtActor);

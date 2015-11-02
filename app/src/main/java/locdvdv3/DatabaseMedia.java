@@ -26,7 +26,8 @@ public class DatabaseMedia extends SQLiteOpenHelper {
     private static final String TABLE_TV_SHOW = "t_tvshow";
     private static final String TABLE_TV_ZOD = "t_tvzod";
     private static final String TABLE_SUMMARY = "t_summary" ;
-    private static final int DATABASE_VERSION = 3;
+    private static final String TABLE_ACTOR = "t_actor" ;
+    private static final int DATABASE_VERSION = 4;
 
 
     public static DatabaseMedia getInstance(Context ctx) {
@@ -78,6 +79,11 @@ public class DatabaseMedia extends SQLiteOpenHelper {
                 "mapper_id INT, " + API.TAG_SUMMARY + " TEXT, " + API.TAG_CREATE_DATE + " DATETIME, " +
                 API.TAG_MODIFY_DATE + " DATETIME )");
 
+        // Add actor table
+        strReq.add("CREATE TABLE " + TABLE_ACTOR + " (" + API.TAG_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "mapper_id INT, " + API.TAG_ACTOR + " TEXT, " + API.TAG_CREATE_DATE + " DATETIME, " +
+                API.TAG_MODIFY_DATE + " DATETIME )");
+
 
 
         for(String query: strReq){
@@ -110,6 +116,11 @@ public class DatabaseMedia extends SQLiteOpenHelper {
             db.execSQL("CREATE TABLE "+TABLE_SUMMARY+" ("+API.TAG_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+
                     "mapper_id INT, "+API.TAG_SUMMARY+" TEXT, "+API.TAG_CREATE_DATE+" DATETIME, "+
                     API.TAG_MODIFY_DATE+" DATETIME )");
+        }else if (newVersion == 4){
+            // Add actor table
+            db.execSQL("CREATE TABLE " + TABLE_ACTOR + " (" + API.TAG_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "mapper_id INT, " + API.TAG_ACTOR + " TEXT, " + API.TAG_CREATE_DATE + " DATETIME, " +
+                    API.TAG_MODIFY_DATE + " DATETIME )");
         }
     }
 
@@ -147,7 +158,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
      */
     public String getLastUpdateDate(String table){
 
-      SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
 
         String[] columns = {"CASE when max("+API.TAG_CREATE_DATE+") > max("+API.TAG_MODIFY_DATE+") then max("+API.TAG_CREATE_DATE+") else max("+API.TAG_MODIFY_DATE+") end  as last_update_date"};
 
@@ -183,6 +194,9 @@ public class DatabaseMedia extends SQLiteOpenHelper {
             case API.TAG_SUMMARY:
                 table = TABLE_SUMMARY;
                 break;
+            case API.TAG_ACTOR:
+                table = TABLE_ACTOR;
+                break;
             default:
                 table = TABLE_MOVIE;
         }
@@ -195,7 +209,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         String[] columns = {API.TAG_ID, API.TAG_TITLE, API.TAG_TAG_LINE, API.TAG_YEAR,
-                        API.TAG_RELEASE_DATE, API.TAG_CREATE_DATE, API.TAG_MODIFY_DATE};
+                        API.TAG_RELEASE_DATE, API.TAG_CREATE_DATE, API.TAG_MODIFY_DATE, "mapper_id"};
 
         Cursor result =  db.query(TABLE_MOVIE, columns, null, null, null, null, API.TAG_CREATE_DATE + " DESC");
 
@@ -231,6 +245,11 @@ public class DatabaseMedia extends SQLiteOpenHelper {
                 e.printStackTrace();
             }
 
+            Mapper mapper = new Mapper();
+            mapper.setId(result.getInt(7));
+            mapper.setType(API.TAG_MOVIE);
+            movie.setMapper(mapper);
+
             lstMovies.add(movie);
 
             result.moveToNext();
@@ -242,5 +261,43 @@ public class DatabaseMedia extends SQLiteOpenHelper {
 
 
         return lstMovies;
+    }
+
+    public ArrayList<Actor> getActorsByMovie(Mapper mapper){
+        ArrayList<Actor> lstActor = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] columns = {API.TAG_ID, API.TAG_ACTOR, API.TAG_CREATE_DATE, API.TAG_MODIFY_DATE};
+        String where = "mapper_id =?";
+        String[] whereArgs = {Integer.toString(mapper.getId())};
+        Cursor result = db.query(TABLE_ACTOR, columns, where, whereArgs, null, null, null);
+
+        result.moveToFirst();
+        while (!result.isAfterLast()){
+            Actor actor = new Actor();
+            actor.setId(result.getInt(0));
+            actor.setMapper(mapper);
+            actor.setActor(result.getString(1));;
+
+            DateFormat date = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ");
+            try {
+                actor.setCreateDate(date.parse(result.getString(2) ));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                actor.setModifyDate(date.parse(result.getString(3) ));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            lstActor.add(actor);
+            result.moveToNext();
+        }
+
+
+
+        return lstActor;
     }
 }
