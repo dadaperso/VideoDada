@@ -1,5 +1,6 @@
 package com.example.dada.res1;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -12,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -20,6 +22,11 @@ import locdvdv3.Movie;
 
 public class DetailItemActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    // TODO create getActorByMovie to get actors on this Movie
+    String[] lsActor = {"Actor 1", "Actor 2", "Actor 3", "Actor 4",
+            "Actor 1", "Actor 2", "Actor 3", "Actor 4",
+            "Actor 1", "Actor 2", "Actor 3", "Actor 4"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,48 +66,63 @@ public class DetailItemActivity extends AppCompatActivity
         TextView txtSummary = (TextView) findViewById(R.id.txtResumerFiche);
         // TODO getSummary method
 
-        LinearLayout actorGroup = (LinearLayout) findViewById(R.id.actorGroup);
+        final LinearLayout actorGroup = (LinearLayout) findViewById(R.id.actorGroup);
 
+        actorGroup.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
-        // TODO create getActorByMovie to get actors on this Movie
-        String[] lsActor = {"Actor 1", "Actor 2", "Actor 3", "Actor 4",
-                        "Actor 1", "Actor 2", "Actor 3", "Actor 4",
-                        "Actor 1", "Actor 2", "Actor 3", "Actor 4"};
+            @SuppressLint("NewApi")
+            @SuppressWarnings("deprecation")
+            @Override
+            public void onGlobalLayout() {
 
-        int width = 0;
+                // Ensure you call it only once :
+                if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    actorGroup.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+                else {
+                    actorGroup.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                }
 
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.HORIZONTAL);
-        actorGroup.addView(layout);
-        LinearLayout parentLayout = layout;
-
-
-        for (String actor : lsActor){
-            TextView txtActor = new TextView(this);
-            txtActor.setText(actor);
-            txtActor.measure(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            width += txtActor.getMeasuredWidth();
-
-            // TODO revoir le placement des textView
-            // TODO add link to Actor activity on textView
-            if(width > parentLayout.getMeasuredWidth() ){
-                layout = new LinearLayout(this);
+                LinearLayout layout = new LinearLayout(DetailItemActivity.this);
+                layout.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 layout.setOrientation(LinearLayout.HORIZONTAL);
-                parentLayout = layout;
-                actorGroup.addView(parentLayout);
+                actorGroup.addView(layout);
+                LinearLayout parentLayout = layout;
+
+                int width = 0;
+                int i = 0;
+                // Here you can get the size :)
+                for (String actor : lsActor){
+                    i++;
+                    TextView txtActor = new TextView(DetailItemActivity.this);
+
+                    if (i < lsActor.length){
+                       txtActor.setText(actor+ ", ");
+                   }else {
+                       txtActor.setText(actor);
+                   }
+
+                    txtActor.measure(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                    width += txtActor.getMeasuredWidth();
+
+                    // TODO add link to Actor activity on textView
+                    if(width > actorGroup.getWidth() ){
+                        layout = new LinearLayout(DetailItemActivity.this);
+                        layout.setOrientation(LinearLayout.HORIZONTAL);
+                        layout.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                        parentLayout = layout;
+                        actorGroup.addView(parentLayout);
+                        width = 0;
+                    }
+
+                    parentLayout.addView(txtActor);
+
+                }
             }
-
-            parentLayout.addView(txtActor);
-
-        }
-
-
-
-
-
-
+        });
 
     }
+
 
     @Override
     public void onBackPressed() {
