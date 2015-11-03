@@ -12,6 +12,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
+
+import java.util.ArrayList;
+
+import locdvdv3.Actor;
+import locdvdv3.ActorFilmAdapter;
+import locdvdv3.DatabaseMedia;
+import locdvdv3.Movie;
 
 public class ActorActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -40,6 +48,21 @@ public class ActorActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        Actor actor = (Actor) getIntent().getSerializableExtra("actor");
+
+        setTitle(actor.getActor());
+
+
+        // TODO getMovieByActors
+        ArrayList<Movie> lstMovie = DatabaseMedia.getInstance(this).getMoviesByActor(actor);
+
+        ListView lstMovieByActor = (ListView) findViewById(R.id.lstVMovieByActor);
+        lstMovieByActor.setAdapter(new ActorFilmAdapter(this, R.layout.item_actor_movie, lstMovie));
+
+
+        // TODO getTvshowsByActors
+
     }
 
     @Override

@@ -9,4 +9,22 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/app_bar_actor" tools:context="com.example.dada.res1.ActorActivity">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtMovieLabel"
+        android:text="@string/locdvd_movie"/>
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="500dp"
+        android:layout_below="@id/txtMovieLabel"
+        android:id="@+id/lstVMovieByActor"></ListView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/lstVMovieByActor"
+        android:text="@string/locdvd_series"/>
+
 </RelativeLayout>

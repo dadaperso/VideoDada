@@ -57,6 +57,7 @@ public class DetailItemActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         Movie movie = (Movie) getIntent().getSerializableExtra("movie");
+        DatabaseMedia dbMedia = DatabaseMedia.getInstance(this);
 
         TextView txtTitle = (TextView) findViewById(R.id.txtTitreFiche);
         txtTitle.setText(movie.getTitle());
@@ -67,11 +68,11 @@ public class DetailItemActivity extends AppCompatActivity
         // TODO implement poster table
 
         TextView txtSummary = (TextView) findViewById(R.id.txtResumerFiche);
-        // TODO getSummary method
+        txtSummary.setText(dbMedia.getSummaryByMapper(movie.getMapper()).getSummary());
 
         final LinearLayout actorGroup = (LinearLayout) findViewById(R.id.actorGroup);
 
-        lsActor = DatabaseMedia.getInstance(this).getActorsByMovie(movie.getMapper());
+        lsActor = dbMedia.getActorsByMovie(movie.getMapper());
 
         actorGroup.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 

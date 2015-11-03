@@ -143,6 +143,12 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         Log.d("DatabaseMedia", "Update " + table + ": " + values.getAsString("title"));
         if (result.getCount() > 0){
             db.update(table, values, whereCond, whereArg);
+            if (table.equals(TABLE_MOVIE) || table.equals(TABLE_TV_ZOD)){
+                String where = "create_date < ? and mapper_id =? ";
+                String[] whereArgs = {values.getAsString("modify_date"), Integer.toString(values.getAsInteger("mapper_id") )};
+                db.delete(TABLE_ACTOR, where, whereArgs);
+            }
+
         }else{  //Sinon CREATE
             db.insert(table, null, values);
         }
@@ -208,11 +214,39 @@ public class DatabaseMedia extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String[] columns = {API.TAG_ID, API.TAG_TITLE, API.TAG_TAG_LINE, API.TAG_YEAR,
-                        API.TAG_RELEASE_DATE, API.TAG_CREATE_DATE, API.TAG_MODIFY_DATE, "mapper_id"};
+        String[] columns = {API.TAG_ID, "mapper_id", API.TAG_TITLE, API.TAG_TAG_LINE, API.TAG_YEAR,
+                        API.TAG_RELEASE_DATE, API.TAG_CREATE_DATE, API.TAG_MODIFY_DATE};
 
         Cursor result =  db.query(TABLE_MOVIE, columns, null, null, null, null, API.TAG_CREATE_DATE + " DESC");
 
+        ArrayList<Movie> lstMovies = this.hydrateMovie(result);
+
+        db.close();
+
+        return lstMovies;
+    }
+
+    public ArrayList<Movie> getMoviesByActor(Actor actor){
+        ArrayList<Movie> lstMovie;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT * FROM "+TABLE_MOVIE+
+                        " WHERE mapper_id IN (" +
+                "           SELECT mapper_id FROM "+TABLE_ACTOR+"" +
+                "           WHERE actor LIKE ?" +
+                "       )";
+        String[] args = {"%"+actor.getActor()+"%"};
+        Cursor result = db.rawQuery(query, args);
+
+        lstMovie = this.hydrateMovie(result);
+
+        db.close();
+
+        return lstMovie;
+    }
+
+    private ArrayList<Movie> hydrateMovie(Cursor result){
         ArrayList<Movie> lstMovies = new ArrayList<>();
 
         result.moveToFirst();
@@ -221,34 +255,35 @@ public class DatabaseMedia extends SQLiteOpenHelper {
             Movie movie = new Movie();
 
             movie.setId(result.getInt(0));
-            movie.setTitle(result.getString(1));
-            movie.setTagLine(result.getString(2));
-            movie.setYear(result.getInt(3));
+
+            Mapper mapper = new Mapper();
+            mapper.setId(result.getInt(1));
+            mapper.setType(API.TAG_MOVIE);
+            movie.setMapper(mapper);
+
+            movie.setTitle(result.getString(2));
+            movie.setTagLine(result.getString(3));
+            movie.setYear(result.getInt(4));
 
             DateFormat date = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ");
 
             try {
-               movie.setOriginallyAvailable(date.parse(result.getString(4)));
+                movie.setOriginallyAvailable(date.parse(result.getString(5)));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
 
             try {
-                movie.setCreateDate(date.parse(result.getString(5)));
+                movie.setCreateDate(date.parse(result.getString(6)));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
 
             try {
-                movie.setModifyDate(date.parse(result.getString(6)));
+                movie.setModifyDate(date.parse(result.getString(7)));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-
-            Mapper mapper = new Mapper();
-            mapper.setId(result.getInt(7));
-            mapper.setType(API.TAG_MOVIE);
-            movie.setMapper(mapper);
 
             lstMovies.add(movie);
 
@@ -256,9 +291,6 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         }
 
         result.close();
-
-        db.close();
-
 
         return lstMovies;
     }
@@ -296,8 +328,46 @@ public class DatabaseMedia extends SQLiteOpenHelper {
             result.moveToNext();
         }
 
+        result.close();
 
+        db.close();
 
         return lstActor;
+    }
+
+    public Summary getSummaryByMapper(Mapper mapper){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String[] columns = {API.TAG_ID, API.TAG_SUMMARY, API.TAG_CREATE_DATE, API.TAG_MODIFY_DATE};
+        String where = "mapper_id=?";
+        String[] whereArgs = {Integer.toString(mapper.getId())};
+        Cursor result = db.query(TABLE_SUMMARY, columns, where, whereArgs, null, null, null);
+
+        Summary summary = null;
+        DateFormat date = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ");
+
+        result.moveToFirst();
+        while (!result.isAfterLast()){
+            summary = new Summary();
+            summary.setId(result.getInt(0));
+            summary.setMapper(mapper);;
+            summary.setSummary(result.getString(1));
+
+            try {
+                summary.setCreateDate(date.parse(result.getString(2)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                summary.setModifyDate(date.parse(result.getString(3)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            result.moveToNext();
+        }
+
+        return summary;
     }
 }
