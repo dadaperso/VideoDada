@@ -1,6 +1,5 @@
 package com.example.dada.res1;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -14,13 +13,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-public class Main2Activity extends AppCompatActivity
+import locdvdv3.API;
+import locdvdv3.Tvshow;
+
+public class DetailTvShowActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
+        setContentView(R.layout.activity_detail_tv_show);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -41,6 +43,15 @@ public class Main2Activity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        Tvshow tvshow = (Tvshow) getIntent().getSerializableExtra(API.TAG_TV_SHOW);
+
+        setTitle(tvshow.getTitle());
+
+        // TODO getSummary
+
+        // TODO getZod
+
     }
 
     @Override
@@ -56,7 +67,7 @@ public class Main2Activity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main2, menu);
+        getMenuInflater().inflate(R.menu.detail_tv_show, menu);
         return true;
     }
 
@@ -81,21 +92,19 @@ public class Main2Activity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_film) {
-            Intent intent = new Intent(Main2Activity.this, FilmActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_serie) {
-            Intent intent = new Intent(Main2Activity.this, TvShowActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_acteur) {
+        if (id == R.id.nav_camara) {
+            // Handle the camera action
+        } else if (id == R.id.nav_gallery) {
 
-        } /*else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
 
-        }*/
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

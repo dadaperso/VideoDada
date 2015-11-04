@@ -1,11 +1,12 @@
 package locdvdv3;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by dada on 26/10/2015.
  */
-public class Tvshow
+public class Tvshow implements Serializable
 {
     private int id, year;
     String title, sortTitle;

@@ -39,6 +39,16 @@
             android:label="@string/title_activity_actor"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
+        <activity
+            android:name=".TvShowActivity"
+            android:label="@string/title_activity_tv_show"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
+        <activity
+            android:name=".DetailTvShowActivity"
+            android:label="@string/title_activity_detail_tv_show"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
     </application>
 
 </manifest>

@@ -104,10 +104,10 @@ public class DatabaseMedia extends SQLiteOpenHelper {
                     API.TAG_CREATE_DATE+" DATETIME, "+API.TAG_MODIFY_DATE+" DATETIME)");
 
             // Add tvshow_episode table
-            strReq.add("CREATE TABLE "+TABLE_TV_ZOD+" ("+ API.TAG_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "tvshow_id INT, mapper_id INT, "+API.TAG_TAG_LINE+" TEXT, "+API.TAG_SEASON+
-                    " INT, "+API.TAG_EPISODE+" INT, "+API.TAG_YEAR+" INT, "+API.TAG_RELEASE_DATE+" DATETIME," +
-                    API.TAG_CREATE_DATE+" DATETIME, "+API.TAG_MODIFY_DATE+" DATETIME)");
+            strReq.add("CREATE TABLE " + TABLE_TV_ZOD + " (" + API.TAG_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "tvshow_id INT, mapper_id INT, " + API.TAG_TAG_LINE + " TEXT, " + API.TAG_SEASON +
+                    " INT, " + API.TAG_EPISODE + " INT, " + API.TAG_YEAR + " INT, " + API.TAG_RELEASE_DATE + " DATETIME," +
+                    API.TAG_CREATE_DATE + " DATETIME, " + API.TAG_MODIFY_DATE + " DATETIME)");
 
             for(String query: strReq){
                 db.execSQL(query);
@@ -406,7 +406,14 @@ public class DatabaseMedia extends SQLiteOpenHelper {
                 String[] whereArgs = {Integer.toString(currentTvShow)};
                 Cursor result2 = db.query(TABLE_TV_SHOW, columns, where, whereArgs, null, null, null);
 
-                tvshow = hydrateTvShow(result2, date);
+                result2.moveToFirst();
+
+                while (!result2.isAfterLast()) {
+                    tvshow = hydrateTvShow(result2, date);
+                    result2.moveToNext();
+                }
+
+
 
                 listTvShow.add(tvshow);
 
@@ -456,13 +463,32 @@ public class DatabaseMedia extends SQLiteOpenHelper {
 
     }
 
+    public ArrayList<Tvshow> getTvShow(){
+        ArrayList<Tvshow> lstTvShow = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] columns = {API.TAG_ID, "mapper_id", API.TAG_TITLE, API.TAG_YEAR,
+                API.TAG_RELEASE_DATE, API.TAG_CREATE_DATE, API.TAG_MODIFY_DATE};
+        Cursor result = db.query(TABLE_TV_SHOW,columns,null,null,null,null,API.TAG_MODIFY_DATE+ " DESC");
+
+        result.moveToFirst();
+        DateFormat date = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ");
+
+        while (!result.isAfterLast()){
+
+            Tvshow tvshow = hydrateTvShow(result, date);
+
+            lstTvShow.add(tvshow);
+
+            result.moveToNext();
+        }
+
+        return lstTvShow;
+    }
+
     private Tvshow hydrateTvShow(Cursor cursor, DateFormat date){
-        cursor.moveToFirst();
 
-        Tvshow tvshow = null;
-
-        while (!cursor.isAfterLast()){
-            tvshow = new Tvshow();
+            Tvshow tvshow = new Tvshow();
             tvshow.setId(cursor.getInt(0));
 
             Mapper mapper = new Mapper();
@@ -491,9 +517,6 @@ public class DatabaseMedia extends SQLiteOpenHelper {
                 e.printStackTrace();
             }
 
-            cursor.moveToNext();
-
-        }
 
         return tvshow;
     }
