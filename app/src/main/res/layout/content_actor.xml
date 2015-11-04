@@ -26,5 +26,9 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/lstVMovieByActor"
         android:text="@string/locdvd_series"/>
+    <ExpandableListView
+        android:layout_width="wrap_content"
+        android:layout_height="500dp"
+        android:id="@+id/lstTvShowByActor"></ExpandableListView>
 
 </RelativeLayout>

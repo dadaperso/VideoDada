@@ -12,14 +12,20 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import locdvdv3.Actor;
 import locdvdv3.ActorFilmAdapter;
+import locdvdv3.ActorTvShowAdapter;
 import locdvdv3.DatabaseMedia;
 import locdvdv3.Movie;
+import locdvdv3.TvZod;
+import locdvdv3.Tvshow;
 
 public class ActorActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -54,7 +60,7 @@ public class ActorActivity extends AppCompatActivity
         setTitle(actor.getActor());
 
 
-        // TODO getMovieByActors
+        // TODO coriger l'aligement des textView
         ArrayList<Movie> lstMovie = DatabaseMedia.getInstance(this).getMoviesByActor(actor);
 
         ListView lstMovieByActor = (ListView) findViewById(R.id.lstVMovieByActor);
@@ -62,6 +68,18 @@ public class ActorActivity extends AppCompatActivity
 
 
         // TODO getTvshowsByActors
+        ArrayList<Tvshow> listTvShow = new ArrayList<>();
+        HashMap<String, ArrayList<TvZod>> listZod = new HashMap<>();
+        DatabaseMedia.getInstance(this).getTvZodByActor(actor, listTvShow, listZod);
+
+        ExpandableListView lstTvZodByActor = (ExpandableListView) findViewById(R.id.lstTvShowByActor);
+
+
+        BaseExpandableListAdapter adapter = new ActorTvShowAdapter(this, listTvShow, listZod);
+        lstTvZodByActor.setAdapter(adapter);
+
+
+
 
     }
 

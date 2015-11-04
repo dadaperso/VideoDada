@@ -11,6 +11,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by damien.lejart on 13/05/2015.
@@ -369,5 +370,131 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         }
 
         return summary;
+    }
+
+    public void getTvZodByActor(Actor actor, ArrayList<Tvshow> listTvShow, HashMap<String, ArrayList<TvZod>> listZod){
+
+        ArrayList<TvZod> lstZod = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM "+TABLE_TV_ZOD+ " as zod"+
+                      " WHERE zod.mapper_id IN ("+
+                            " SELECT mapper_id FROM "+TABLE_ACTOR+
+                            " WHERE "+API.TAG_ACTOR+" LIKE ? )";
+        String[] args = {"%"+actor.getActor()+"%"};
+
+
+        Cursor result = db.rawQuery(query, args);
+        Log.d("DataMedia", "SQL getZodByActor = " + query + "\n args = "+args.toString());
+
+
+        int currentTvShow = 0;
+        Tvshow tvshow = null;
+        DateFormat date = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ");
+        result.moveToFirst();
+        while (!result.isAfterLast()){
+
+            // récupération de l'objet TvShow
+            if (result.getInt(1) == currentTvShow) {
+
+                if (tvshow != null)
+                    listZod.put(tvshow.getTitle(), lstZod);
+
+                currentTvShow = result.getInt(1);
+                String[] columns = {API.TAG_ID, "mapper_id", API.TAG_TITLE, API.TAG_YEAR,
+                        API.TAG_RELEASE_DATE, API.TAG_CREATE_DATE, API.TAG_MODIFY_DATE};
+                String where = "id=?";
+                String[] whereArgs = {Integer.toString(currentTvShow)};
+                Cursor result2 = db.query(TABLE_TV_SHOW, columns, where, whereArgs, null, null, null);
+
+                tvshow = hydrateTvShow(result2, date);
+
+                listTvShow.add(tvshow);
+
+                if (listZod.containsKey(tvshow.getTitle())){
+                    lstZod = listZod.get(tvshow.getTitle());
+                }else {
+                    lstZod = new ArrayList<>();
+                }
+            }
+
+            TvZod tvZod = new TvZod();
+            tvZod.setId(result.getInt(0));
+            tvZod.setTvshow(tvshow);
+
+            Mapper mapper =new Mapper();
+            mapper.setId(result.getInt(3));
+            tvZod.setMapper(mapper);
+
+            tvZod.setTagLine(result.getString(4));
+            tvZod.setSaison(result.getInt(5));
+            tvZod.setEpisode(result.getInt(6));
+            tvZod.setYear(result.getInt(7));
+
+            try {
+                tvZod.setReleaseDate(date.parse(result.getString(8)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                tvZod.setCreateDate(date.parse(result.getString(11)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                tvZod.setModifyDate(date.parse(result.getString(12)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            lstZod.add(tvZod);
+
+            result.moveToNext();
+        }
+
+
+    }
+
+    private Tvshow hydrateTvShow(Cursor cursor, DateFormat date){
+        cursor.moveToFirst();
+
+        Tvshow tvshow = null;
+
+        while (!cursor.isAfterLast()){
+            tvshow = new Tvshow();
+            tvshow.setId(cursor.getInt(0));
+
+            Mapper mapper = new Mapper();
+            mapper.setId(cursor.getInt(1));
+            mapper.setType(API.TAG_TV_SHOW);
+            tvshow.setMapper(mapper);
+
+            tvshow.setTitle(cursor.getString(2));
+            tvshow.setYear(cursor.getInt(3));
+
+            try {
+                tvshow.setReleaseDate(date.parse(cursor.getString(4)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                tvshow.setCreateDate(date.parse(cursor.getString(5)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                tvshow.setModifyDate(date.parse(cursor.getString(6)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            cursor.moveToNext();
+
+        }
+
+        return tvshow;
     }
 }
