@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+
 /**
  * Created by damien.lejart on 13/05/2015.
  */
@@ -376,7 +377,11 @@ public class DatabaseMedia extends SQLiteOpenHelper {
 
         ArrayList<TvZod> lstZod = null;
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM "+TABLE_TV_ZOD+ " as zod"+
+
+        String[] columns1 = {API.TAG_ID, "tvshow_id", "mapper_id", API.TAG_TAG_LINE, API.TAG_SEASON,
+                API.TAG_EPISODE, API.TAG_YEAR, API.TAG_RELEASE_DATE, API.TAG_CREATE_DATE,
+                API.TAG_MODIFY_DATE};
+        String query = "SELECT "+columns1.toString()+" FROM "+TABLE_TV_ZOD+ " as zod"+
                       " WHERE zod.mapper_id IN ("+
                             " SELECT mapper_id FROM "+TABLE_ACTOR+
                             " WHERE "+API.TAG_ACTOR+" LIKE ? )";
@@ -384,8 +389,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
 
 
         Cursor result = db.rawQuery(query, args);
-        Log.d("DataMedia", "SQL getZodByActor = " + query + "\n args = "+args.toString());
-
+        Log.d("DataMedia", "SQL getZodByActor = " + query + "\n args = " + args.toString());
 
         int currentTvShow = 0;
         Tvshow tvshow = null;
@@ -424,42 +428,105 @@ public class DatabaseMedia extends SQLiteOpenHelper {
                 }
             }
 
-            TvZod tvZod = new TvZod();
-            tvZod.setId(result.getInt(0));
+            TvZod tvZod = hydrateTvZod(result,date);
+
             tvZod.setTvshow(tvshow);
-
-            Mapper mapper =new Mapper();
-            mapper.setId(result.getInt(3));
-            tvZod.setMapper(mapper);
-
-            tvZod.setTagLine(result.getString(4));
-            tvZod.setSaison(result.getInt(5));
-            tvZod.setEpisode(result.getInt(6));
-            tvZod.setYear(result.getInt(7));
-
-            try {
-                tvZod.setReleaseDate(date.parse(result.getString(8)));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                tvZod.setCreateDate(date.parse(result.getString(11)));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                tvZod.setModifyDate(date.parse(result.getString(12)));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
 
             lstZod.add(tvZod);
 
             result.moveToNext();
         }
 
+
+    }
+
+    // TODO revoir les donnée recupérer (saison manquante)
+    public Object[] getTvZodByTvShow(Tvshow tvshow, HashMap<String, ArrayList<TvZod>> listZod, ArrayList<String> dataListSeason){
+
+        Object[] response = new Object[2];
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] columns = {API.TAG_ID, "tvshow_id", "mapper_id", API.TAG_TAG_LINE, API.TAG_SEASON,
+                        API.TAG_EPISODE, API.TAG_YEAR, API.TAG_RELEASE_DATE, API.TAG_CREATE_DATE,
+                        API.TAG_MODIFY_DATE};
+        String where = "tvshow_id=?";
+        String[] whereArgs = {Integer.toString(tvshow.getId())};
+        String order = API.TAG_SEASON+" ASC, "+API.TAG_EPISODE+" ASC";
+        Cursor result = db.query(TABLE_TV_ZOD, columns, where, whereArgs, null, null, order);
+
+        DateFormat date = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ");
+        int currentSeason = 0;
+        ArrayList<TvZod> lstZod = null;
+
+        result.moveToFirst();
+        while (!result.isAfterLast()){
+
+            if (currentSeason != result.getInt(4)){
+                if (currentSeason != 0){
+                    listZod.put(Integer.toString(currentSeason), lstZod);
+                    dataListSeason.add(Integer.toString(currentSeason) );
+                }
+
+                currentSeason = result.getInt(4);
+
+                if (listZod.containsKey(currentSeason)){
+                    lstZod = listZod.get(currentSeason);
+                }else {
+                    lstZod = new ArrayList<TvZod>();
+                }
+
+            }
+
+            TvZod tvZod = hydrateTvZod(result,date);
+            lstZod.add(tvZod);
+
+            result.moveToNext();
+        }
+
+        response[0] = dataListSeason;
+        response[1] = listZod;
+
+        return response;
+    }
+
+    private TvZod hydrateTvZod(Cursor result, DateFormat date){
+        TvZod tvZod = new TvZod();
+        tvZod.setId(result.getInt(0));
+
+
+        Mapper mapper =new Mapper();
+        mapper.setId(result.getInt(2));
+        tvZod.setMapper(mapper);
+
+        String titre = result.getString(3);
+        if (titre == null){
+            titre = "Episode "+result.getInt(5);
+        }
+        tvZod.setTagLine(result.getString(3));
+        tvZod.setSaison(result.getInt(4));
+        tvZod.setEpisode(result.getInt(5));
+        tvZod.setYear(result.getInt(6));
+
+        try {
+            tvZod.setReleaseDate(date.parse(result.getString(7)));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e){
+            e.printStackTrace();
+        }
+
+        try {
+            tvZod.setCreateDate(date.parse(result.getString(8)));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            tvZod.setModifyDate(date.parse(result.getString(9)));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return tvZod;
 
     }
 
@@ -501,7 +568,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
 
             try {
                 tvshow.setReleaseDate(date.parse(cursor.getString(4)));
-            } catch (ParseException e) {
+            } catch (ParseException|NullPointerException e) {
                 e.printStackTrace();
             }
 

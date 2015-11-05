@@ -1,6 +1,5 @@
 package com.example.dada.res1;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -13,27 +12,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ExpandableListView;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import locdvdv3.API;
-import locdvdv3.DatabaseMedia;
-import locdvdv3.TvShowZodAdapter;
-import locdvdv3.TvZod;
-import locdvdv3.Tvshow;
-
-public class DetailTvShowActivity extends AppCompatActivity
+public class DetailTvZodActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
-    ArrayList<String> dataListSeason = new ArrayList();
-    HashMap<String,ArrayList<TvZod>> dataListZod = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail_tv_show);
+        setContentView(R.layout.activity_detail_tv_zod);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -54,32 +40,6 @@ public class DetailTvShowActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        Tvshow tvshow = (Tvshow) getIntent().getSerializableExtra(API.TAG_TV_SHOW);
-
-        setTitle(tvshow.getTitle());
-
-        // TODO getSummary
-
-        // TODO getZod
-        Object[] data = DatabaseMedia.getInstance(this).getTvZodByTvShow(tvshow, dataListZod, dataListSeason);
-        dataListSeason = (ArrayList<String>) data[0];
-        dataListZod = (HashMap<String, ArrayList<TvZod>>) data[1];
-        final TvShowZodAdapter adapter = new TvShowZodAdapter(this,dataListSeason,dataListZod);
-
-
-        ExpandableListView listTvZod = (ExpandableListView) findViewById(R.id.lstTvShowZod);
-        listTvZod.setAdapter(adapter);
-
-        listTvZod.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                TvZod tvZod = adapter.getChild(groupPosition, childPosition);
-                Intent intent = new Intent(DetailTvShowActivity.this, DetailTvZodActivity.class);
-                startActivity(intent);
-                return true;
-            }
-        });
     }
 
     @Override
@@ -95,7 +55,7 @@ public class DetailTvShowActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.detail_tv_show, menu);
+        getMenuInflater().inflate(R.menu.detail_tv_zod, menu);
         return true;
     }
 

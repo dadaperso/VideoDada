@@ -23,4 +23,6 @@
     <string name="locdvd_series">Tv Show</string>
     <string name="title_activity_tv_show">TvShowActivity</string>
     <string name="title_activity_detail_tv_show">DetailTvShowActivity</string>
+    <string name="locdvd_season">Season</string>
+    <string name="title_activity_detail_tv_zod">DetailTvZodActivity</string>
 </resources>
