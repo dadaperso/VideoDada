@@ -1,5 +1,8 @@
 package com.example.dada.res1;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -12,6 +15,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+
+import locdvdv3.API;
+import locdvdv3.Actor;
+import locdvdv3.DatabaseMedia;
+import locdvdv3.TvZod;
 
 public class DetailTvZodActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -40,6 +54,106 @@ public class DetailTvZodActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        TvZod zod = (TvZod) getIntent().getSerializableExtra(API.TAG_TV_ZOD);
+
+        DatabaseMedia dbMedia = DatabaseMedia.getInstance(this);
+
+        String title = zod.getTvshow().getTitle()+" S"+zod.getSaison()+"E"+zod.getEpisode();
+        setTitle(title);
+
+        // TODO add style to text
+        TextView txtZodTitle = (TextView) findViewById(R.id.txtTvZodTitle);
+        txtZodTitle.setText(zod.getTagLine());
+
+        TextView txtTvZodSeason = (TextView) findViewById(R.id.txtTvZodSeason);
+        Resources res = getResources();
+        String lblSeason = res.getString(R.string.locdvd_tv_zod_season);
+        txtTvZodSeason.setText(String.format(lblSeason,zod.getSaison()));
+
+
+        TextView txtTvZodEpisode = (TextView) findViewById(R.id.txtTvZodEpisode);
+        String lblZod = res.getString(R.string.locdvd_tv_zod_episode);
+        txtTvZodEpisode.setText(String.format(lblZod,zod.getSaison()));
+
+
+        TextView txtTvZodRelaseDate = (TextView) findViewById(R.id.txtTvZodReleaseDate);
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        txtTvZodRelaseDate.setText(df.format(zod.getReleaseDate()));
+
+
+        final LinearLayout actorGroup = (LinearLayout) findViewById(R.id.tvZodActors);
+
+        final ArrayList<Actor> lsActor = dbMedia.getActorsByMapper(zod.getMapper());
+
+        actorGroup.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+            @SuppressLint("NewApi")
+            @SuppressWarnings("deprecation")
+            @Override
+            public void onGlobalLayout() {
+
+                // Ensure you call it only once :
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    actorGroup.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                } else {
+                    actorGroup.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                }
+
+                LinearLayout layout = new LinearLayout(DetailTvZodActivity.this);
+                layout.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                layout.setOrientation(LinearLayout.HORIZONTAL);
+                actorGroup.addView(layout);
+                LinearLayout parentLayout = layout;
+
+                int width = 0;
+                int i = 0;
+                // Here you can get the size :)
+                // TODO resize actorGroup on click on txtActorLabel
+                for (final Actor actor : lsActor) {
+                    i++;
+                    TextView txtActor = new TextView(DetailTvZodActivity.this);
+                    txtActor.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(DetailTvZodActivity.this, ActorActivity.class);
+                            intent.putExtra("actor", actor);
+                            startActivity(intent);
+                        }
+                    });
+
+                    if (i < lsActor.size()) {
+                        txtActor.setText(actor + ", ");
+
+                    } else {
+                        txtActor.setText(actor.toString());
+                    }
+
+                    txtActor.measure(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                    width += txtActor.getMeasuredWidth();
+
+                    // TODO add link to Actor activity on textView
+                    if (width > actorGroup.getWidth()) {
+                        layout = new LinearLayout(DetailTvZodActivity.this);
+                        layout.setOrientation(LinearLayout.HORIZONTAL);
+                        layout.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                        parentLayout = layout;
+                        actorGroup.addView(parentLayout);
+                        width = txtActor.getMeasuredWidth();
+                    }
+
+                    parentLayout.addView(txtActor);
+
+                }
+            }
+        });
+
+
+        // TODO txtRsumer
+        TextView txtTvZodResumer = (TextView) findViewById(R.id.txtTvZodSummary);
+        txtTvZodResumer.setText(dbMedia.getSummaryByMapper(zod.getMapper()).getSummary());
+
+
     }
 
     @Override

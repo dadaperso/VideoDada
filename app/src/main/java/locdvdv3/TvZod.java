@@ -1,25 +1,18 @@
 package locdvdv3;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by dada on 04/11/2015.
  */
-public class TvZod
+public class TvZod implements Serializable
 {
-    private String sortTitle, tagLine;
+    private String tagLine;
     private int  id, saison, episode, year;
     private Date releaseDate, createDate, modifyDate;
     private Mapper mapper;
     private Tvshow tvshow;
-
-    public String getSortTitle() {
-        return sortTitle;
-    }
-
-    public void setSortTitle(String sortTitle) {
-        this.sortTitle = sortTitle;
-    }
 
     public String getTagLine() {
         return tagLine;

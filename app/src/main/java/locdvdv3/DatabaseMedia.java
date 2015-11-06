@@ -297,7 +297,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         return lstMovies;
     }
 
-    public ArrayList<Actor> getActorsByMovie(Mapper mapper){
+    public ArrayList<Actor> getActorsByMapper(Mapper mapper){
         ArrayList<Actor> lstActor = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -373,15 +373,16 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         return summary;
     }
 
-    public void getTvZodByActor(Actor actor, ArrayList<Tvshow> listTvShow, HashMap<String, ArrayList<TvZod>> listZod){
+    public Object[] getTvZodByActor(Actor actor, ArrayList<Tvshow> listTvShow, HashMap<String, ArrayList<TvZod>> listZod){
 
+        Object[] response = new Object[2];
         ArrayList<TvZod> lstZod = null;
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String[] columns1 = {API.TAG_ID, "tvshow_id", "mapper_id", API.TAG_TAG_LINE, API.TAG_SEASON,
-                API.TAG_EPISODE, API.TAG_YEAR, API.TAG_RELEASE_DATE, API.TAG_CREATE_DATE,
-                API.TAG_MODIFY_DATE};
-        String query = "SELECT "+columns1.toString()+" FROM "+TABLE_TV_ZOD+ " as zod"+
+        String columns1 = API.TAG_ID+", tvshow_id, mapper_id,"+ API.TAG_TAG_LINE+", "+ API.TAG_SEASON+
+                ","+ API.TAG_EPISODE+", "+ API.TAG_YEAR+", "+ API.TAG_RELEASE_DATE+", "+
+                API.TAG_CREATE_DATE+", "+ API.TAG_MODIFY_DATE;
+        String query = "SELECT "+columns1+" FROM "+TABLE_TV_ZOD+ " as zod"+
                       " WHERE zod.mapper_id IN ("+
                             " SELECT mapper_id FROM "+TABLE_ACTOR+
                             " WHERE "+API.TAG_ACTOR+" LIKE ? )";
@@ -391,14 +392,15 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         Cursor result = db.rawQuery(query, args);
         Log.d("DataMedia", "SQL getZodByActor = " + query + "\n args = " + args.toString());
 
-        int currentTvShow = 0;
+
         Tvshow tvshow = null;
         DateFormat date = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ");
         result.moveToFirst();
+        int currentTvShow = 0;
         while (!result.isAfterLast()){
 
             // récupération de l'objet TvShow
-            if (result.getInt(1) == currentTvShow) {
+            if (result.getInt(1) != currentTvShow) {
 
                 if (tvshow != null)
                     listZod.put(tvshow.getTitle(), lstZod);
@@ -437,10 +439,14 @@ public class DatabaseMedia extends SQLiteOpenHelper {
             result.moveToNext();
         }
 
+        listZod.put(tvshow.getTitle(), lstZod);
 
+        response[0]= listTvShow;
+        response[1] = listZod;
+
+        return response;
     }
 
-    // TODO revoir les donnée recupérer (saison manquante)
     public Object[] getTvZodByTvShow(Tvshow tvshow, HashMap<String, ArrayList<TvZod>> listZod, ArrayList<String> dataListSeason){
 
         Object[] response = new Object[2];
@@ -477,10 +483,16 @@ public class DatabaseMedia extends SQLiteOpenHelper {
             }
 
             TvZod tvZod = hydrateTvZod(result,date);
+            tvZod.setTvshow(tvshow);
+
             lstZod.add(tvZod);
 
             result.moveToNext();
         }
+
+        dataListSeason.add(Integer.toString(currentSeason));
+        listZod.put(Integer.toString(currentSeason), lstZod);
+
 
         response[0] = dataListSeason;
         response[1] = listZod;
@@ -587,4 +599,6 @@ public class DatabaseMedia extends SQLiteOpenHelper {
 
         return tvshow;
     }
+
+
 }

@@ -1,16 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginLeft="30dp"
         android:id="@+id/txtActorTvShowTitle"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/txtActorTvShowRole"/>
+        android:id="@+id/txtActorTvShowRole"
+        android:layout_toEndOf="@id/txtActorTvShowTitle"
+        android:layout_toRightOf="@id/txtActorTvShowTitle"
+        android:text="Role"/>
 
-</LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtActorTvShowNumZod"
+        android:text="num Zod"
+        android:layout_below="@id/txtActorTvShowTitle"
+        android:layout_alignStart="@id/txtActorTvShowTitle"
+        android:layout_alignLeft="@id/txtActorTvShowTitle"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"/>
+
+</RelativeLayout>

@@ -1,6 +1,7 @@
 package locdvdv3;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,7 +47,7 @@ public class ActorTvShowAdapter extends BaseExpandableListAdapter {
     public View getChildView(int groupPosition, final int childPosition,
                              boolean isLastChild, View convertView, ViewGroup parent) {
 
-        final TvZod childText = (TvZod) getChild(groupPosition, childPosition);
+        final TvZod zod = (TvZod) getChild(groupPosition, childPosition);
 
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this._context
@@ -55,9 +56,13 @@ public class ActorTvShowAdapter extends BaseExpandableListAdapter {
         }
 
         TextView txtListChild = (TextView) convertView
-                .findViewById(R.id.txtActorTvShowTitle);
+                .findViewById(R.id.txtActorTvZodTitle);
+        txtListChild.setText(zod.getTagLine());
 
-        txtListChild.setText(childText.getTagLine());
+        TextView txtActorTvZodNum = (TextView) convertView.findViewById(R.id.txtActorTvZodNum);
+        String lblNumSeasonAndZod = convertView.getResources().getString(R.string.locdvd_num_season_and_zod);
+        txtActorTvZodNum.setText(String.format(lblNumSeasonAndZod, zod.getSaison(), zod.getEpisode()));
+
         return convertView;
     }
 
@@ -96,6 +101,12 @@ public class ActorTvShowAdapter extends BaseExpandableListAdapter {
                 .findViewById(R.id.txtActorTvShowTitle);
         lblListHeader.setTypeface(null, Typeface.BOLD);
         lblListHeader.setText(headerTitle);
+
+        TextView txtActorTvShowNumZod = (TextView) convertView.findViewById(R.id.txtActorTvShowNumZod);
+        Resources res = convertView.getResources();
+        int nbZod = getChildrenCount(groupPosition);
+        String text = res.getQuantityString(R.plurals.locdvd_actor_num_zod, nbZod, nbZod);
+        txtActorTvShowNumZod.setText(text);
 
         return convertView;
     }

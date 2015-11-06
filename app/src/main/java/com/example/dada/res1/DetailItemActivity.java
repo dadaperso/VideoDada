@@ -72,7 +72,7 @@ public class DetailItemActivity extends AppCompatActivity
 
         final LinearLayout actorGroup = (LinearLayout) findViewById(R.id.actorGroup);
 
-        lsActor = dbMedia.getActorsByMovie(movie.getMapper());
+        lsActor = dbMedia.getActorsByMapper(movie.getMapper());
 
         actorGroup.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 

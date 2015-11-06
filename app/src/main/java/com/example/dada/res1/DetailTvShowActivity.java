@@ -76,6 +76,7 @@ public class DetailTvShowActivity extends AppCompatActivity
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                 TvZod tvZod = adapter.getChild(groupPosition, childPosition);
                 Intent intent = new Intent(DetailTvShowActivity.this, DetailTvZodActivity.class);
+                intent.putExtra(API.TAG_TV_ZOD, tvZod);
                 startActivity(intent);
                 return true;
             }
