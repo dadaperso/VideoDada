@@ -22,6 +22,7 @@ import java.util.Map;
 public class API
 {
 
+
     private final DatabaseMedia dbMedia;
     private ProgressDialog pDialog;
     private Context context;
@@ -32,7 +33,6 @@ public class API
     public static final String TAG_TV_ZOD = "tvZod";
     public static final String TAG_ID = "id";
     public static final String TAG_MAPPER = "mapper";
-    public static final String TAG_MAPPER_ID = "id";
     public static final String TAG_MAPPER_TYPE = "type";
     public static final String TAG_TITLE = "title";
     public static final String TAG_TAG_LINE = "tag_line";
@@ -45,6 +45,7 @@ public class API
     public static final String TAG_EPISODE = "episode";
     public static final String TAG_SUMMARY = "summary";
     public static final String TAG_ACTOR = "actor";
+    public static final String TAG_MAPPER_ID = "mapper_id";
 
 
     //TODO create table for listing all field of tables DB
@@ -62,6 +63,7 @@ public class API
 
         String[] id = {TAG_ID, "int"};
         String[] mapper = {TAG_MAPPER, "object"};
+        String[] type = {TAG_MAPPER_TYPE, "string"};
         String[] title = {TAG_TITLE, "string"};
         String[] sortTitle = {TAG_SORT_TITLE, "string"};
         String[] tagLine = {TAG_TAG_LINE, "string"};
@@ -94,6 +96,9 @@ public class API
         String[][] actorFields = {id , mapper, actor, createDate, modifyDate};
         fieldsTables.put(TAG_ACTOR, actorFields);
 
+        String[][] mapperFields = {id, type};
+        fieldsTables.put(TAG_MAPPER,mapperFields);
+
 
     }
 
@@ -112,6 +117,10 @@ public class API
 
     public void updateActor() {
         new GetData(TAG_ACTOR).execute();
+    }
+
+    public void updateMapper(){
+        new GetData(TAG_MAPPER).execute();
     }
 
     /**
@@ -144,7 +153,7 @@ public class API
 
             String table = dbMedia.getTagToTable(this.type);
 
-            String lastUpdate = dbMedia.getLastUpdateDate(table);
+            String lastUpdate = dbMedia.getLastUpdateDateOrId(table);
 
             // Making a request to url and getting response
             String urlQuery = "/update/check.json?entities[]="+this.type;
@@ -152,6 +161,7 @@ public class API
             if (lastUpdate != null){
                 urlQuery+= "&lastUpdate="+lastUpdate;
             }
+
             Log.d("Query: ", "> "+urlQuery);
 
             String jsonStr = sh.makeServiceCall(urlQuery, ServiceHandler.GET);

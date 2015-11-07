@@ -116,7 +116,7 @@ public class DetailTvZodActivity extends AppCompatActivity
                     txtActor.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent intent = new Intent(DetailTvZodActivity.this, ActorActivity.class);
+                            Intent intent = new Intent(DetailTvZodActivity.this, DetailActorActivity.class);
                             intent.putExtra("actor", actor);
                             startActivity(intent);
                         }

@@ -8,7 +8,7 @@ import java.util.Date;
  */
 public class Actor implements Serializable
 {
-    private int id;
+    private int id, nbZod, nbMovie;
     private Mapper mapper;
     private String actor;
     private Date createDate, modifyDate;
@@ -51,6 +51,22 @@ public class Actor implements Serializable
 
     public void setModifyDate(Date modifyDate) {
         this.modifyDate = modifyDate;
+    }
+
+    public int getNbZod() {
+        return nbZod;
+    }
+
+    public void setNbZod(int nbZod) {
+        this.nbZod = nbZod;
+    }
+
+    public int getNbMovie() {
+        return nbMovie;
+    }
+
+    public void setNbMovie(int nbMovie) {
+        this.nbMovie = nbMovie;
     }
 
     @Override

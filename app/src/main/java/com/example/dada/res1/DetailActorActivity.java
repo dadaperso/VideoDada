@@ -1,5 +1,6 @@
 package com.example.dada.res1;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -12,20 +13,28 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.GridView;
+import android.widget.ExpandableListView;
+import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import locdvdv3.API;
 import locdvdv3.Actor;
+import locdvdv3.ActorFilmAdapter;
+import locdvdv3.ActorTvShowAdapter;
 import locdvdv3.DatabaseMedia;
+import locdvdv3.Movie;
+import locdvdv3.TvZod;
+import locdvdv3.Tvshow;
 
-public class ActorActivity extends AppCompatActivity
+public class DetailActorActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_actor);
+        setContentView(R.layout.activity_detail_actor);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -47,13 +56,42 @@ public class ActorActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        ArrayList<Actor> dataListActor = DatabaseMedia.getInstance(this).getActors();
-        GridView listActor = (GridView) findViewById(R.id.actorView);
+        Actor actor = (Actor) getIntent().getSerializableExtra("actor");
 
-        // TODO setAdapteur ActorAdapter
+        setTitle(actor.getActor());
 
-        // TODO setOnItemListener
 
+        // TODO coriger l'aligement des textView
+        ArrayList<Movie> lstMovie = DatabaseMedia.getInstance(this).getMoviesByActor(actor);
+        ListView lstMovieByActor = (ListView) findViewById(R.id.lstVMovieByActor);
+        if (lstMovie.size() > 0) {
+            lstMovieByActor.setAdapter(new ActorFilmAdapter(this, R.layout.item_actor_movie, lstMovie));
+        }else {
+            findViewById(R.id.txtMovieLabel).setVisibility(View.GONE);
+            lstMovieByActor.setVisibility(View.GONE);
+        }
+
+        // TODO fixed groug Item (http://stackoverflow.com/questions/10613552/pinned-groups-in-expandablelistview)
+        ArrayList<Tvshow> listTvShow = new ArrayList<>();
+        HashMap<String, ArrayList<TvZod>> listZod = new HashMap<>();
+        Object[] data = DatabaseMedia.getInstance(this).getTvZodByActor(actor, listTvShow, listZod);
+
+        ExpandableListView lstTvZodByActor = (ExpandableListView) findViewById(R.id.lstTvShowByActor);
+
+
+        final ActorTvShowAdapter adapter = new ActorTvShowAdapter(this, (ArrayList<Tvshow>) data[0],(HashMap)data[1]);
+        lstTvZodByActor.setAdapter(adapter);
+        lstTvZodByActor.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                TvZod zod = adapter.getChild(groupPosition,childPosition);
+                Intent intent = new Intent(DetailActorActivity.this, DetailTvZodActivity.class);
+                intent.putExtra(API.TAG_TV_ZOD, zod);
+                startActivity(intent);
+
+                return true;
+            }
+        });
 
     }
 

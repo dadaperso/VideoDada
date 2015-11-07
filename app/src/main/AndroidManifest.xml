@@ -35,7 +35,7 @@
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
-            android:name=".ActorActivity"
+            android:name=".DetailActorActivity"
             android:label="@string/title_activity_actor"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
@@ -52,6 +52,11 @@
         <activity
             android:name=".DetailTvZodActivity"
             android:label="@string/title_activity_detail_tv_zod"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
+        <activity
+            android:name=".ActorActivity"
+            android:label="@string/title_activity_actor"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
     </application>

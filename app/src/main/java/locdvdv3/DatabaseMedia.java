@@ -29,6 +29,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
     private static final String TABLE_TV_ZOD = "t_tvzod";
     private static final String TABLE_SUMMARY = "t_summary" ;
     private static final String TABLE_ACTOR = "t_actor" ;
+    private static final String TABLE_MAPPER = "t_mapper" ;
     private static final int DATABASE_VERSION = 4;
 
 
@@ -54,34 +55,39 @@ public class DatabaseMedia extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         ArrayList<String> strReq = new ArrayList<>();
 
+        // Create MOVIE table
         strReq.add("CREATE TABLE "+TABLE_MOVIE+" ("+ API.TAG_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "mapper_id INT, "+API.TAG_TITLE+" TEXT ,"+API.TAG_TAG_LINE+" TEXT ,"+API.TAG_YEAR+" INT, "+API.TAG_RELEASE_DATE+" DATETIME," +
                 API.TAG_CREATE_DATE+" DATETIME, "+API.TAG_MODIFY_DATE+" DATETIME)");
 
+        // Create VideoFile table
         strReq.add("CREATE TABLE " + TABLE_VIDEO_FILE + " (id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "mapper_id INT, path TEXT, file_size INT, duration INT, container_type TEXT, " +
                 "video_codec TEXT, video_bitrate INT, resolutionx INT, resolutiony INT, " +
                 "audio_codec TEXT, audio_bitrate INR, channel INT, create_date DATETIME, " +
                 "modify_date DATETIME)");
 
-        strReq.add("CREATE TABLE t_mapper (id INTEGER PRIMARY KEY AUTOINCREMENT, type TEXT)");
+        // Create Mapper table
+        strReq.add("CREATE TABLE "+TABLE_MAPPER+" ("+API.TAG_ID+" INTEGER PRIMARY KEY AUTOINCREMENT,"+
+                API.TAG_MAPPER_TYPE+" TEXT)");
 
+        // Create TvShow table
         strReq.add("CREATE TABLE "+TABLE_TV_SHOW+" ("+ API.TAG_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "mapper_id INT, "+API.TAG_TITLE+" TEXT, "+API.TAG_YEAR+" INT, "+API.TAG_RELEASE_DATE+" DATETIME," +
                 API.TAG_CREATE_DATE+" DATETIME, "+API.TAG_MODIFY_DATE+" DATETIME)");
 
-        // Add tvshow_episode table
+        // Create TvZod table
         strReq.add("CREATE TABLE " + TABLE_TV_ZOD + " (" + API.TAG_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "tvshow_id INT, mapper_id INT, " + API.TAG_TAG_LINE + " TEXT, " + API.TAG_SEASON +
                 " INT, " + API.TAG_EPISODE + " INT, " + API.TAG_YEAR + " INT, " + API.TAG_RELEASE_DATE + " DATETIME," +
                 API.TAG_CREATE_DATE + " DATETIME, " + API.TAG_MODIFY_DATE + " DATETIME)");
 
-        // Add summary table
+        // Create Summary table
         strReq.add("CREATE TABLE " + TABLE_SUMMARY + " (" + API.TAG_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "mapper_id INT, " + API.TAG_SUMMARY + " TEXT, " + API.TAG_CREATE_DATE + " DATETIME, " +
                 API.TAG_MODIFY_DATE + " DATETIME )");
 
-        // Add actor table
+        // Create Actor table
         strReq.add("CREATE TABLE " + TABLE_ACTOR + " (" + API.TAG_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "mapper_id INT, " + API.TAG_ACTOR + " TEXT, " + API.TAG_CREATE_DATE + " DATETIME, " +
                 API.TAG_MODIFY_DATE + " DATETIME )");
@@ -164,18 +170,29 @@ public class DatabaseMedia extends SQLiteOpenHelper {
      * @param table Name of table to check update
      * @return
      */
-    public String getLastUpdateDate(String table){
+    public String getLastUpdateDateOrId(String table){
 
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String[] columns = {"CASE when max("+API.TAG_CREATE_DATE+") > max("+API.TAG_MODIFY_DATE+") then max("+API.TAG_CREATE_DATE+") else max("+API.TAG_MODIFY_DATE+") end  as last_update_date"};
+        String[] columns = new String[1];
+        if (table.equals(TABLE_MAPPER)){
+            columns[0] = "MAX("+ API.TAG_ID +") as last_id";
+        }else {
+            columns[0] = "CASE when max("+API.TAG_CREATE_DATE+") > max("+API.TAG_MODIFY_DATE+") then"+
+                    " max("+API.TAG_CREATE_DATE+") else max("+API.TAG_MODIFY_DATE+") end "+
+                    " as last_update_date";
+        }
 
         Cursor result = db.query(table, columns,null,null, null, null, null);
 
         String lastUpdate = null;
         result.moveToFirst();
         while (!result.isAfterLast()){
-            lastUpdate = result.getString(0);
+            if (table.equals(TABLE_MAPPER)){
+                lastUpdate = Integer.toString(result.getInt(0));
+            }else {
+                lastUpdate = result.getString(0);
+            }
             result.moveToNext();
         }
 
@@ -204,6 +221,9 @@ public class DatabaseMedia extends SQLiteOpenHelper {
                 break;
             case API.TAG_ACTOR:
                 table = TABLE_ACTOR;
+                break;
+            case API.TAG_MAPPER:
+                table = TABLE_MAPPER;
                 break;
             default:
                 table = TABLE_MOVIE;
@@ -601,4 +621,40 @@ public class DatabaseMedia extends SQLiteOpenHelper {
     }
 
 
+    public ArrayList<Actor> getActors() {
+        ArrayList<Actor> lstActor = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String sql = "select "+API.TAG_ACTOR+", "+API.TAG_MAPPER_TYPE+", count("+API.TAG_MAPPER_TYPE+")" +
+                " FROM "+TABLE_ACTOR+" as a"+
+                " INNER JOIN "+TABLE_MAPPER+" as map ON map."+API.TAG_ID+" = a."+API.TAG_MAPPER_ID+
+                " GROUP BY "+API.TAG_ACTOR+", "+API.TAG_MAPPER_TYPE+" ORDER BY "+API.TAG_ACTOR+" ASC";
+
+        Cursor result = db.rawQuery(sql, null);
+        result.moveToFirst();
+
+        String currentActor ="";
+        Actor actor = new Actor();
+        while (!result.isAfterLast()){
+            String actorName = result.getString(0);
+            String type = result.getString(1);
+            int nbType = result.getInt(2);
+
+            if (currentActor != actorName){
+                lstActor.add(actor);
+                actor = new Actor();
+            }
+
+            if (type.equals(API.TAG_MOVIE)){
+                actor.setNbMovie(nbType);
+            }else if (type.equals(API.TAG_TV_ZOD)){
+                actor.setNbZod(nbType);
+            }
+
+            result.moveToNext();
+        }
+
+        return lstActor;
+    }
 }
