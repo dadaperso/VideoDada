@@ -257,7 +257,8 @@ public class DatabaseMedia extends SQLiteOpenHelper {
                         " WHERE mapper_id IN (" +
                 "           SELECT mapper_id FROM "+TABLE_ACTOR+"" +
                 "           WHERE actor LIKE ?" +
-                "       )";
+                "       )" +
+                "        ORDER BY year DESC";
         String[] args = {"%"+actor.getActor()+"%"};
         Cursor result = db.rawQuery(query, args);
 
@@ -408,7 +409,8 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         String query = "SELECT "+columns1+" FROM "+TABLE_TV_ZOD+ " as zod"+
                       " WHERE zod.mapper_id IN ("+
                             " SELECT mapper_id FROM "+TABLE_ACTOR+
-                            " WHERE "+API.TAG_ACTOR+" LIKE ? )";
+                            " WHERE "+API.TAG_ACTOR+" LIKE ? )"+
+                      " ORDER BY "+API.TAG_SEASON+" ASC, "+API.TAG_EPISODE+" ASC";
         String[] args = {"%"+actor.getActor()+"%"};
 
 

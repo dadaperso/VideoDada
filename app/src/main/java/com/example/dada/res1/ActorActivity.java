@@ -1,5 +1,6 @@
 package com.example.dada.res1;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -95,18 +96,15 @@ public class ActorActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camara) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        if (id == R.id.nav_film) {
+            Intent intent = new Intent(ActorActivity.this, FilmActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_serie) {
+            Intent intent = new Intent(ActorActivity.this, TvShowActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_acteur) {
+//            Intent intent = new Intent(Main2Activity.this, ActorActivity.class);
+//            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

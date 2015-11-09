@@ -146,18 +146,15 @@ public class DetailActorActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camara) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        if (id == R.id.nav_film) {
+            Intent intent = new Intent(DetailActorActivity.this, FilmActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_serie) {
+            Intent intent = new Intent(DetailActorActivity.this, TvShowActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_acteur) {
+            Intent intent = new Intent(DetailActorActivity.this, ActorActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

@@ -25,7 +25,7 @@ import locdvdv3.Actor;
 import locdvdv3.DatabaseMedia;
 import locdvdv3.Movie;
 
-public class DetailItemActivity extends AppCompatActivity
+public class DetailMovieActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     // TODO create getActorByMovie to get actors on this Movie
@@ -89,7 +89,7 @@ public class DetailItemActivity extends AppCompatActivity
                     actorGroup.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 }
 
-                LinearLayout layout = new LinearLayout(DetailItemActivity.this);
+                LinearLayout layout = new LinearLayout(DetailMovieActivity.this);
                 layout.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 layout.setOrientation(LinearLayout.HORIZONTAL);
                 actorGroup.addView(layout);
@@ -101,11 +101,11 @@ public class DetailItemActivity extends AppCompatActivity
                 // TODO resize actorGroup on click on txtActorLabel
                 for (final Actor actor : lsActor){
                     i++;
-                    TextView txtActor = new TextView(DetailItemActivity.this);
+                    TextView txtActor = new TextView(DetailMovieActivity.this);
                     txtActor.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent intent = new Intent(DetailItemActivity.this,DetailActorActivity.class);
+                            Intent intent = new Intent(DetailMovieActivity.this,DetailActorActivity.class);
                             intent.putExtra("actor", actor);
                             startActivity(intent);
                         }
@@ -123,7 +123,7 @@ public class DetailItemActivity extends AppCompatActivity
 
                     // TODO add link to Actor activity on textView
                     if(width > actorGroup.getWidth() ){
-                        layout = new LinearLayout(DetailItemActivity.this);
+                        layout = new LinearLayout(DetailMovieActivity.this);
                         layout.setOrientation(LinearLayout.HORIZONTAL);
                         layout.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                         parentLayout = layout;
@@ -178,18 +178,15 @@ public class DetailItemActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camara) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        if (id == R.id.nav_film) {
+            Intent intent = new Intent(DetailMovieActivity.this, FilmActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_serie) {
+            Intent intent = new Intent(DetailMovieActivity.this, TvShowActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_acteur) {
+            Intent intent = new Intent(DetailMovieActivity.this, ActorActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

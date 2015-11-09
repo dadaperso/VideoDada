@@ -74,13 +74,17 @@ public class DetailTvZodActivity extends AppCompatActivity
 
         TextView txtTvZodEpisode = (TextView) findViewById(R.id.txtTvZodEpisode);
         String lblZod = res.getString(R.string.locdvd_tv_zod_episode);
-        txtTvZodEpisode.setText(String.format(lblZod,zod.getSaison()));
+        txtTvZodEpisode.setText(String.format(lblZod,zod.getEpisode()));
 
 
         TextView txtTvZodRelaseDate = (TextView) findViewById(R.id.txtTvZodReleaseDate);
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        txtTvZodRelaseDate.setText(df.format(zod.getReleaseDate()));
-
+        try {
+            txtTvZodRelaseDate.setText(df.format(zod.getReleaseDate()));
+        }catch (NullPointerException e){
+            e.printStackTrace();
+            txtTvZodRelaseDate.setText("0000-00-00");
+        }
 
         final LinearLayout actorGroup = (LinearLayout) findViewById(R.id.tvZodActors);
 
@@ -194,20 +198,16 @@ public class DetailTvZodActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camara) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        if (id == R.id.nav_film) {
+            Intent intent = new Intent(DetailTvZodActivity.this, FilmActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_serie) {
+            Intent intent = new Intent(DetailTvZodActivity.this, TvShowActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_acteur) {
+            Intent intent = new Intent(DetailTvZodActivity.this, ActorActivity.class);
+            startActivity(intent);
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

@@ -5,7 +5,6 @@ package locdvdv3;
  */
 
 import android.content.Context;
-import android.widget.Toast;
 
 import org.apache.http.NameValuePair;
 
@@ -68,7 +67,6 @@ public class ServiceHandler {
 
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(context,e.getMessage(), Toast.LENGTH_LONG).show();
         }
 
         return null;

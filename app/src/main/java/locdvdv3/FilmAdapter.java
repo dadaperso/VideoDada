@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.dada.res1.DetailItemActivity;
+import com.example.dada.res1.DetailMovieActivity;
 import com.example.dada.res1.R;
 
 import java.text.DateFormat;
@@ -93,7 +93,7 @@ public class FilmAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                Intent intent = new Intent(mContext, DetailItemActivity.class);
+                Intent intent = new Intent(mContext, DetailMovieActivity.class);
                 intent.putExtra("movie",getItem(result.getId()));
 
                 mContext.startActivity(intent);
