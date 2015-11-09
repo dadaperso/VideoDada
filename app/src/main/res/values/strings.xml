@@ -28,14 +28,22 @@
     <string name="locdvd_tv_zod_episode">Episode: %1$d</string>
     <string name="locdvd_num_season_and_zod">S%1$dE%2$d</string>
     <string name="title_activity_detail_tv_zod">DetailTvZodActivity</string>
-    <plurals name="locdvd_actor_num_zod">
+    <plurals name="locdvd_actor_nb_zod">
+        <item quantity="zero">episode none</item>
         <item quantity="one">%d episode</item>
         <item quantity="few">%d episodes</item>
         <item quantity="many">%d episodes</item>
         <item quantity="other">%d episodes</item>
     </plurals>
+    <plurals name="locdvd_actor_nb_movie">
+        <item quantity="zero">movie none</item>
+        <item quantity="one">%d movie</item>
+        <item quantity="few">%d movies</item>
+        <item quantity="many">%d movies</item>
+        <item quantity="other">%d movies</item>
+    </plurals>
 
-<!-- TODO: Remove or change this placeholder text -->
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
 

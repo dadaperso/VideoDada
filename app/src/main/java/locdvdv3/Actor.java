@@ -13,6 +13,12 @@ public class Actor implements Serializable
     private String actor;
     private Date createDate, modifyDate;
 
+    public Actor()
+    {
+        this.nbMovie = -1;
+        this.nbZod = -1;
+    }
+
     public int getId() {
         return id;
     }
@@ -34,7 +40,7 @@ public class Actor implements Serializable
     }
 
     public void setActor(String actor) {
-        this.actor = actor;
+        this.actor = actor.trim();
     }
 
     public Date getCreateDate() {

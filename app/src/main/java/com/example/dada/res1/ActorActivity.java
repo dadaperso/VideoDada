@@ -17,6 +17,7 @@ import android.widget.GridView;
 import java.util.ArrayList;
 
 import locdvdv3.Actor;
+import locdvdv3.ActorAdapter;
 import locdvdv3.DatabaseMedia;
 
 public class ActorActivity extends AppCompatActivity
@@ -49,8 +50,7 @@ public class ActorActivity extends AppCompatActivity
 
         ArrayList<Actor> dataListActor = DatabaseMedia.getInstance(this).getActors();
         GridView listActor = (GridView) findViewById(R.id.actorView);
-
-        // TODO setAdapteur ActorAdapter
+        listActor.setAdapter(new ActorAdapter(this,dataListActor));
 
         // TODO setOnItemListener
 

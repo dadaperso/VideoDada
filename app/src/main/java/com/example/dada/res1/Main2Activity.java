@@ -88,7 +88,8 @@ public class Main2Activity extends AppCompatActivity
             Intent intent = new Intent(Main2Activity.this, TvShowActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_acteur) {
-
+            Intent intent = new Intent(Main2Activity.this, ActorActivity.class);
+            startActivity(intent);
         } /*else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {

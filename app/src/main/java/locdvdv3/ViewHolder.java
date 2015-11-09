@@ -9,8 +9,9 @@ import android.widget.TextView;
  */
 public class ViewHolder {
 
-    ImageView imgAffiche;
-    TextView  txtTitle;
-    TextView  txtReleaseDate;
+    ImageView   imgAffiche;
+    TextView    txtTitle;
+    TextView    txtReleaseDate;
+    TextView    txtNbAparencie;
     ImageButton btnOption;
 }

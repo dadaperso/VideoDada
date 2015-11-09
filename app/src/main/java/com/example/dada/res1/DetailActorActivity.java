@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,36 +63,48 @@ public class DetailActorActivity extends AppCompatActivity
 
 
         // TODO coriger l'aligement des textView
-        ArrayList<Movie> lstMovie = DatabaseMedia.getInstance(this).getMoviesByActor(actor);
         ListView lstMovieByActor = (ListView) findViewById(R.id.lstVMovieByActor);
-        if (lstMovie.size() > 0) {
-            lstMovieByActor.setAdapter(new ActorFilmAdapter(this, R.layout.item_actor_movie, lstMovie));
+        // Si provenance ActorActivity test nbAparencie
+        if (actor.getNbMovie() == -1 || actor.getNbMovie()> 0) {
+            ArrayList<Movie> lstMovie = DatabaseMedia.getInstance(this).getMoviesByActor(actor);
+            if (lstMovie.size() > 0) {
+                lstMovieByActor.setAdapter(new ActorFilmAdapter(this, R.layout.item_actor_movie, lstMovie));
+            } else {
+                findViewById(R.id.txtMovieLabel).setVisibility(View.GONE);
+                lstMovieByActor.setVisibility(View.GONE);
+            }
         }else {
             findViewById(R.id.txtMovieLabel).setVisibility(View.GONE);
             lstMovieByActor.setVisibility(View.GONE);
         }
 
         // TODO fixed groug Item (http://stackoverflow.com/questions/10613552/pinned-groups-in-expandablelistview)
-        ArrayList<Tvshow> listTvShow = new ArrayList<>();
-        HashMap<String, ArrayList<TvZod>> listZod = new HashMap<>();
-        Object[] data = DatabaseMedia.getInstance(this).getTvZodByActor(actor, listTvShow, listZod);
-
         ExpandableListView lstTvZodByActor = (ExpandableListView) findViewById(R.id.lstTvShowByActor);
+        // Si provenance ActorActivity test nbAparencie
+        if (actor.getNbZod() == -1 || actor.getNbZod() > 0 ){
+            Object[] data = DatabaseMedia.getInstance(this).getTvZodByActor(actor);
 
+            final ActorTvShowAdapter adapter = new ActorTvShowAdapter(this, (ArrayList<Tvshow>) data[0],(HashMap)data[1]);
 
-        final ActorTvShowAdapter adapter = new ActorTvShowAdapter(this, (ArrayList<Tvshow>) data[0],(HashMap)data[1]);
-        lstTvZodByActor.setAdapter(adapter);
-        lstTvZodByActor.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                TvZod zod = adapter.getChild(groupPosition,childPosition);
-                Intent intent = new Intent(DetailActorActivity.this, DetailTvZodActivity.class);
-                intent.putExtra(API.TAG_TV_ZOD, zod);
-                startActivity(intent);
+            lstTvZodByActor.setAdapter(adapter);
+            lstTvZodByActor.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+                @Override
+                public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                    TvZod zod = adapter.getChild(groupPosition,childPosition);
+                    Intent intent = new Intent(DetailActorActivity.this, DetailTvZodActivity.class);
+                    intent.putExtra(API.TAG_TV_ZOD, zod);
+                    startActivity(intent);
 
-                return true;
-            }
-        });
+                    return true;
+                }
+            });
+        }else {
+            lstTvZodByActor.setVisibility(View.GONE);
+
+            TextView lblTvShow = (TextView) findViewById(R.id.lblActorTvShowList);
+            lblTvShow.setVisibility(View.GONE);
+        }
+
 
     }
 

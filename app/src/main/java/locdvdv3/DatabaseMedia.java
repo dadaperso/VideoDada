@@ -393,10 +393,13 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         return summary;
     }
 
-    public Object[] getTvZodByActor(Actor actor, ArrayList<Tvshow> listTvShow, HashMap<String, ArrayList<TvZod>> listZod){
+    public Object[] getTvZodByActor(Actor actor){
 
         Object[] response = new Object[2];
         ArrayList<TvZod> lstZod = null;
+        HashMap<String, ArrayList<TvZod>> listZod = new HashMap<>();
+        ArrayList<Tvshow> listTvShow = new ArrayList<>();
+
         SQLiteDatabase db = this.getReadableDatabase();
 
         String columns1 = API.TAG_ID+", tvshow_id, mapper_id,"+ API.TAG_TAG_LINE+", "+ API.TAG_SEASON+
@@ -410,7 +413,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
 
 
         Cursor result = db.rawQuery(query, args);
-        Log.d("DataMedia", "SQL getZodByActor = " + query + "\n args = " + args.toString());
+        Log.d("DataMedia", "SQL getZodByActor = " + query + "\n args = " + args[0]);
 
 
         Tvshow tvshow = null;
@@ -459,7 +462,8 @@ public class DatabaseMedia extends SQLiteOpenHelper {
             result.moveToNext();
         }
 
-        listZod.put(tvshow.getTitle(), lstZod);
+        if (tvshow != null)
+            listZod.put(tvshow.getTitle(), lstZod);
 
         response[0]= listTvShow;
         response[1] = listZod;
@@ -634,21 +638,27 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         Cursor result = db.rawQuery(sql, null);
         result.moveToFirst();
 
-        String currentActor ="";
+        String currentActor = result.getString(0);
         Actor actor = new Actor();
+        actor.setActor(currentActor);
+
         while (!result.isAfterLast()){
             String actorName = result.getString(0);
             String type = result.getString(1);
             int nbType = result.getInt(2);
 
-            if (currentActor != actorName){
+            if (!currentActor.equals(actorName)){
                 lstActor.add(actor);
                 actor = new Actor();
+                // add name into Object
+                actor.setActor(result.getString(0));
+                currentActor = actorName;
             }
 
+            // add nb aparence by media type
             if (type.equals(API.TAG_MOVIE)){
                 actor.setNbMovie(nbType);
-            }else if (type.equals(API.TAG_TV_ZOD)){
+            }else if (type.equals("tvshow_episode")){
                 actor.setNbZod(nbType);
             }
 

@@ -105,7 +105,7 @@ public class ActorTvShowAdapter extends BaseExpandableListAdapter {
         TextView txtActorTvShowNumZod = (TextView) convertView.findViewById(R.id.txtActorTvShowNumZod);
         Resources res = convertView.getResources();
         int nbZod = getChildrenCount(groupPosition);
-        String text = res.getQuantityString(R.plurals.locdvd_actor_num_zod, nbZod, nbZod);
+        String text = res.getQuantityString(R.plurals.locdvd_actor_nb_zod, nbZod, nbZod);
         txtActorTvShowNumZod.setText(text);
 
         return convertView;
