@@ -36,6 +36,8 @@ public class DataConstruction extends Activity {
 
         api.updateMapper();
 
+        api.updateVideoFile();
+
         databaseMedia.close();
 
     }

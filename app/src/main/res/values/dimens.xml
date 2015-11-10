@@ -7,4 +7,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="locdvd_grid_column_width">130dp</dimen>
+    <dimen name="locdvd_file_detail_margin_bottom">5dp</dimen>
+    <dimen name="locdvd_file_detail_margin_left">10dp</dimen>
+    <dimen name="locdvd_file_detail_margin_top">15dp</dimen>
 </resources>

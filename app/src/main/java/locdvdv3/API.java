@@ -22,7 +22,6 @@ import java.util.Map;
 public class API
 {
 
-
     private final DatabaseMedia dbMedia;
     private ProgressDialog pDialog;
     private Context context;
@@ -46,6 +45,18 @@ public class API
     public static final String TAG_SUMMARY = "summary";
     public static final String TAG_ACTOR = "actor";
     public static final String TAG_MAPPER_ID = "mapper_id";
+    public static final String TAG_VIDEO_FILE = "video_file";
+    public static final String TAG_FILE_SIZE = "filesize";
+    public static final String TAG_PATH = "path";
+    public static final String TAG_DURATION = "duration";
+    public static final String TAG_CONTAINER_TYPE = "container_type";
+    public static final String TAG_VIDEO_CODEC = "video_codec";
+    public static final String TAG_RESOLUTIONY = "resolutiony";
+    public static final String TAG_RESOLUTIONX = "resolutionx";
+    public static final String TAG_VIDEO_BITERATE = "video_bitrate";
+    public static final String TAG_AUDIO_CODEC = "audio_codec";
+    public static final String TAG_AUDIO_BITRATE = "audio_bitrate";
+    public static final String TAG_CHANNEL = "channel";
 
 
     //TODO create table for listing all field of tables DB
@@ -76,6 +87,19 @@ public class API
         String[] tvShow = {TAG_TV_SHOW, "object"};
         String[] summary = {TAG_SUMMARY, "string"};
         String[] actor = {TAG_ACTOR, "string"};
+        String[] fileSize = {TAG_FILE_SIZE, "int"};
+        String[] path = {TAG_PATH, "string"};
+        String[] duration = {TAG_DURATION, "int"};
+        String[] containerType = {TAG_CONTAINER_TYPE, "string"};
+        String[] videoCodec = {TAG_VIDEO_CODEC, "string"};
+        String[] videoBirate = {TAG_VIDEO_BITERATE, "int"};
+        String[] resolutionX = {TAG_RESOLUTIONX, "int"};
+        String[] resolutionY = {TAG_RESOLUTIONY, "int"};
+        String[] audioCodec = {TAG_AUDIO_CODEC, "string"};
+        String[] audioBitrate = {TAG_AUDIO_BITRATE, "int"};
+        String[] channel = {TAG_CHANNEL, "int"};
+
+
 
 
         String[][] movieFields = {id, mapper, title, tagLine,
@@ -99,6 +123,11 @@ public class API
         String[][] mapperFields = {id, type};
         fieldsTables.put(TAG_MAPPER,mapperFields);
 
+        String[][] videoFileFields = {id, mapper, path, fileSize, duration, containerType, videoCodec,
+                                    videoBirate, resolutionX, resolutionY, audioCodec, audioBitrate,
+                                    channel, createDate, modifyDate};
+        fieldsTables.put(TAG_VIDEO_FILE,videoFileFields);
+
 
     }
 
@@ -121,6 +150,10 @@ public class API
 
     public void updateMapper(){
         new GetData(TAG_MAPPER).execute();
+    }
+
+    public void updateVideoFile(){
+        new GetData(TAG_VIDEO_FILE).execute();
     }
 
     /**

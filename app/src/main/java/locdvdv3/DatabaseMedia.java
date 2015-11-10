@@ -61,11 +61,12 @@ public class DatabaseMedia extends SQLiteOpenHelper {
                 API.TAG_CREATE_DATE+" DATETIME, "+API.TAG_MODIFY_DATE+" DATETIME)");
 
         // Create VideoFile table
-        strReq.add("CREATE TABLE " + TABLE_VIDEO_FILE + " (id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "mapper_id INT, path TEXT, file_size INT, duration INT, container_type TEXT, " +
-                "video_codec TEXT, video_bitrate INT, resolutionx INT, resolutiony INT, " +
-                "audio_codec TEXT, audio_bitrate INR, channel INT, create_date DATETIME, " +
-                "modify_date DATETIME)");
+        strReq.add("CREATE TABLE " + TABLE_VIDEO_FILE + " ("+API.TAG_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                API.TAG_MAPPER_ID+" INT, "+API.TAG_PATH+" TEXT, "+API.TAG_FILE_SIZE+" INT, "+
+                API.TAG_DURATION+" INT, "+API.TAG_CONTAINER_TYPE+" TEXT, " + API.TAG_VIDEO_CODEC+" TEXT, "+
+                API.TAG_VIDEO_BITERATE+" INT, "+API.TAG_RESOLUTIONX+" INT, "+API.TAG_RESOLUTIONY+" INT, " +
+                API.TAG_AUDIO_CODEC+" TEXT, "+API.TAG_AUDIO_BITRATE+" INT, "+API.TAG_CHANNEL+" INT, "+
+                API.TAG_CREATE_DATE+" DATETIME, " +API.TAG_MODIFY_DATE+ " DATETIME)");
 
         // Create Mapper table
         strReq.add("CREATE TABLE "+TABLE_MAPPER+" ("+API.TAG_ID+" INTEGER PRIMARY KEY AUTOINCREMENT,"+
@@ -148,7 +149,27 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         Cursor result = db.query(table, columns, whereCond, whereArg, null, null, null);
 
         //Alors UPDATE
-        Log.d("DatabaseMedia", "Update " + table + ": " + values.getAsString("title"));
+        String field="";
+        switch (table){
+            case TABLE_TV_SHOW:
+            case TABLE_MOVIE:
+                field = API.TAG_TITLE;
+                break ;
+            case TABLE_TV_ZOD:
+                field = API.TAG_TAG_LINE;
+                break;
+            case TABLE_ACTOR:
+                field = API.TAG_ACTOR;
+                break;
+            case TABLE_VIDEO_FILE:
+                field = API.TAG_PATH;
+                break;
+        }
+
+
+        Log.d("DatabaseMedia", "Update " + table + ": " + values.getAsString(field));
+
+
         if (result.getCount() > 0){
             db.update(table, values, whereCond, whereArg);
             if (table.equals(TABLE_MOVIE) || table.equals(TABLE_TV_ZOD)){
@@ -224,6 +245,9 @@ public class DatabaseMedia extends SQLiteOpenHelper {
                 break;
             case API.TAG_MAPPER:
                 table = TABLE_MAPPER;
+                break;
+            case API.TAG_VIDEO_FILE:
+                table = TABLE_VIDEO_FILE;
                 break;
             default:
                 table = TABLE_MOVIE;
@@ -626,7 +650,6 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         return tvshow;
     }
 
-
     public ArrayList<Actor> getActors() {
         ArrayList<Actor> lstActor = new ArrayList<>();
 
@@ -668,5 +691,43 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         }
 
         return lstActor;
+    }
+
+    public VideoFile getVideoFileByMapper(Mapper mapper) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String[] columns = {API.TAG_ID,API.TAG_MAPPER_ID,API.TAG_PATH, API.TAG_FILE_SIZE,
+                            API.TAG_DURATION, API.TAG_CONTAINER_TYPE, API.TAG_VIDEO_CODEC,
+                            API.TAG_VIDEO_BITERATE, API.TAG_RESOLUTIONX, API.TAG_RESOLUTIONY,
+                            API.TAG_AUDIO_CODEC, API.TAG_AUDIO_BITRATE, API.TAG_CHANNEL};
+        String where = API.TAG_MAPPER_ID+"=?";
+        String[] whereArgs = {Integer.toString(mapper.getId())};
+
+        Cursor result = db.query(TABLE_VIDEO_FILE, columns, where, whereArgs, null, null, null);
+
+        VideoFile videoFile = null;
+
+        result.moveToFirst();
+
+        while (!result.isAfterLast()){
+            videoFile = new VideoFile();
+
+            videoFile.setPath(result.getString(2));
+            videoFile.setFileSize(result.getInt(3));
+            videoFile.setDuration(result.getInt(4));
+            videoFile.setContainerType(result.getString(5));
+            videoFile.setVideoCodec(result.getString(6));
+            videoFile.setVideoBitrate(result.getInt(7));
+            videoFile.setResolutionx(result.getInt(8));
+            videoFile.setResolutiony(result.getInt(9));
+            videoFile.setAudioCodec(result.getString(10));
+            videoFile.setAudioBitrate(result.getInt(11));
+            videoFile.setChannel(result.getInt(12));
+
+            result.moveToNext();
+        }
+
+        return videoFile;
     }
 }

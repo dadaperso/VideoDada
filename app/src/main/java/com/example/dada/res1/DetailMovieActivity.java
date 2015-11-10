@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -30,6 +31,7 @@ public class DetailMovieActivity extends AppCompatActivity
 
     // TODO create getActorByMovie to get actors on this Movie
     ArrayList<Actor> lsActor;
+    Movie movie;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +58,7 @@ public class DetailMovieActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        Movie movie = (Movie) getIntent().getSerializableExtra("movie");
+        movie = (Movie) getIntent().getSerializableExtra("movie");
         DatabaseMedia dbMedia = DatabaseMedia.getInstance(this);
 
         TextView txtTitle = (TextView) findViewById(R.id.txtTitreFiche);
@@ -167,6 +169,13 @@ public class DetailMovieActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }else if(id == R.id.action_video_propriety){
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("mapper",movie.getMapper());
+            DialogFragment newFragment = new DetailVideoFileFragment();
+            newFragment.setArguments(bundle);
+            newFragment.show(getSupportFragmentManager(), "video_details");
+
         }
 
         return super.onOptionsItemSelected(item);
