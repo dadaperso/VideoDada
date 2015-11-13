@@ -60,6 +60,8 @@ public class SplashScreen extends Activity {
 
         api.updateVideoFile();
 
+        api.updateGenre();
+
 
     }
 }

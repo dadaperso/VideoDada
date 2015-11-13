@@ -16,6 +16,7 @@ import com.dada.videstation.model.Tvshow;
 import com.dada.videstation.model.VideoFile;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -29,6 +30,7 @@ import java.util.HashMap;
  */
 public class DatabaseMedia extends SQLiteOpenHelper {
 
+
     private static DatabaseMedia mInstance;
     Context context;
 
@@ -40,7 +42,8 @@ public class DatabaseMedia extends SQLiteOpenHelper {
     private static final String TABLE_SUMMARY = "t_summary" ;
     private static final String TABLE_ACTOR = "t_actor" ;
     private static final String TABLE_MAPPER = "t_mapper" ;
-    private static final int DATABASE_VERSION = 4;
+    private static final String TABLE_GENRE = "t_genre";
+    private static final int DATABASE_VERSION = 5;
 
 
     public static DatabaseMedia getInstance(Context ctx) {
@@ -67,8 +70,9 @@ public class DatabaseMedia extends SQLiteOpenHelper {
 
         // Create MOVIE table
         strReq.add("CREATE TABLE "+TABLE_MOVIE+" ("+ API.TAG_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "mapper_id INT, "+API.TAG_TITLE+" TEXT ,"+API.TAG_TAG_LINE+" TEXT ,"+API.TAG_YEAR+" INT, "+API.TAG_RELEASE_DATE+" DATETIME," +
-                API.TAG_CREATE_DATE+" DATETIME, "+API.TAG_MODIFY_DATE+" DATETIME)");
+                "mapper_id INT, "+API.TAG_TITLE+" TEXT ,"+API.TAG_TAG_LINE+" TEXT ,"+API.TAG_YEAR+" INT, "+
+                API.TAG_RELEASE_DATE+" DATETIME,"+API.TAG_CREATE_DATE+" DATETIME, "+API.TAG_MODIFY_DATE+" DATETIME, "
+                +API.TAG_RATING+" TEXT)");
 
         // Create VideoFile table
         strReq.add("CREATE TABLE " + TABLE_VIDEO_FILE + " ("+API.TAG_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -103,7 +107,10 @@ public class DatabaseMedia extends SQLiteOpenHelper {
                 "mapper_id INT, " + API.TAG_ACTOR + " TEXT, " + API.TAG_CREATE_DATE + " DATETIME, " +
                 API.TAG_MODIFY_DATE + " DATETIME )");
 
-
+        // Create Genre table
+        strReq.add("CREATE TABLE "+TABLE_GENRE+" ("+API.TAG_ID+" INTEGER PRIMARY KEY AUTOINCREMENT,"+
+                API.TAG_MAPPER_ID+" INT, "+API.TAG_GENRE+" TEXT, "+API.TAG_CREATE_DATE+" DATETIME,"+
+                API.TAG_MODIFY_DATE+" DATETIME )");
 
         for(String query: strReq){
             db.execSQL(query);
@@ -140,6 +147,10 @@ public class DatabaseMedia extends SQLiteOpenHelper {
             db.execSQL("CREATE TABLE " + TABLE_ACTOR + " (" + API.TAG_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "mapper_id INT, " + API.TAG_ACTOR + " TEXT, " + API.TAG_CREATE_DATE + " DATETIME, " +
                     API.TAG_MODIFY_DATE + " DATETIME )");
+        }else if (newVersion == 5){
+            db.execSQL("CREATE TABLE "+TABLE_GENRE+" ("+API.TAG_ID+" INTEGER PRIMARY KEY AUTOINCREMENT,"+
+                    API.TAG_MAPPER_ID+" INT, "+API.TAG_GENRE+" TEXT, "+API.TAG_CREATE_DATE+" DATETIME,"+
+                    API.TAG_MODIFY_DATE+" DATETIME)");
         }
     }
 
@@ -174,6 +185,8 @@ public class DatabaseMedia extends SQLiteOpenHelper {
             case TABLE_VIDEO_FILE:
                 field = API.TAG_PATH;
                 break;
+            case TABLE_GENRE:
+                field = API.TAG_GENRE;
         }
 
 
@@ -255,6 +268,9 @@ public class DatabaseMedia extends SQLiteOpenHelper {
                 break;
             case API.TAG_VIDEO_FILE:
                 table = TABLE_VIDEO_FILE;
+                break;
+            case API.TAG_GENRE:
+                table = TABLE_GENRE;
                 break;
             default:
                 table = TABLE_MOVIE;
@@ -783,10 +799,68 @@ public class DatabaseMedia extends SQLiteOpenHelper {
     public void deleteData(String table, JSONArray data) {
         SQLiteDatabase db = getWritableDatabase();
 
-        String ids = data.toString().replace('[', ' ').replace(']', ' ');
+        String mapperIds = "";
 
-        String   where = "id IN (?)";
-        String[] whereArg = {ids};
-        db.delete(table,where,whereArg);
+        for (int i=0;i<data.length();i++){
+            try {
+                mapperIds += Integer.toString(this.getMapperIdByEntityId((int)data.get(i),table));
+                if (i != data.length()-1){
+                    mapperIds+=",";
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        String   whereArg = mapperIds;
+        String   where = "mapper_id IN ("+whereArg+")";
+        String   whereMapper = "id IN ("+whereArg+")";
+
+        Log.d("delteData", "delete from "+table+" where mapper_id IN ("+whereArg+")");
+
+        // debut transaction for delete child of Entity
+       // db.beginTransaction();
+        //delelte genre, actor, summary, mapper, videofile MAPPER_ID ?
+        int resultG = db.delete(TABLE_GENRE, where,null);
+        Log.d("delteData", "delete from " + TABLE_GENRE + " where mapper_id IN (" + whereArg + ")");
+        Log.d("delteData", "result:" + resultG + " row affected");
+        int resultA = db.delete(TABLE_ACTOR, where, null);
+        Log.d("delteData", "delete from " + TABLE_ACTOR + " where mapper_id IN (" + whereArg + ")");
+        Log.d("delteData", "result:" + resultA + " row affected");
+        int resultS = db.delete(TABLE_SUMMARY, where, null);
+        Log.d("delteData", "delete from " + TABLE_SUMMARY + " where mapper_id IN (" + whereArg + ")");
+        Log.d("delteData", "result:" + resultS + " row affected");
+        int resultV = db.delete(TABLE_VIDEO_FILE, where, null);
+        Log.d("delteData", "delete from " + TABLE_VIDEO_FILE + " where mapper_id IN (" + whereArg + ")");
+        Log.d("delteData", "result:" + resultV + " row affected");
+        int resultE = db.delete(table, where, null);
+        Log.d("delteData", "delete from " + table + " where mapper_id IN (" + whereArg + ")");
+        Log.d("delteData", "result:" + resultE + " row affected");
+        int resultMap = db.delete(TABLE_MAPPER, whereMapper, null);
+        Log.d("delteData", "delete from " + TABLE_MAPPER + " where id IN (" + whereArg + ")");
+        Log.d("delteData", "result:"+resultMap+" row affected");
+
+       /* db.setTransactionSuccessful();
+        db.endTransaction();*/
+    }
+
+    private int getMapperIdByEntityId(int id, String table) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String[] columns = {API.TAG_MAPPER_ID};
+        String where = "id=?";
+        String[] whereArgs = {Integer.toString(id)};
+        Cursor result = db.query(table, columns, where, whereArgs, null, null, null);
+
+        int mapper_id = 0;
+
+        result.moveToFirst();
+        while (!result.isAfterLast()){
+            mapper_id = result.getInt(0);
+            result.moveToNext();
+        }
+
+        return mapper_id;
     }
 }

@@ -55,6 +55,8 @@ public class API
     public static final String TAG_AUDIO_CODEC = "audio_codec";
     public static final String TAG_AUDIO_BITRATE = "audio_bitrate";
     public static final String TAG_CHANNEL = "channel";
+    public static final String TAG_RATING = "certificate";
+    public static final String TAG_GENRE = "gnere" ;
 
 
     //TODO create table for listing all field of tables DB
@@ -97,12 +99,14 @@ public class API
         String[] audioCodec = {TAG_AUDIO_CODEC, "string"};
         String[] audioBitrate = {TAG_AUDIO_BITRATE, "int"};
         String[] channel = {TAG_CHANNEL, "int"};
+        String[] rating = {TAG_RATING, "string"};
+        String[] genre = {TAG_GENRE, "string"};
 
 
 
 
         String[][] movieFields = {id, mapper, title, tagLine,
-                    year, releaseDate, createDate, modifyDate};
+                    year, releaseDate, createDate, modifyDate, rating};
         fieldsTables.put(TAG_MOVIE, movieFields);
 
         String[][] tvShowFields = {id, mapper, title, year,
@@ -110,7 +114,7 @@ public class API
         fieldsTables.put(TAG_TV_SHOW, tvShowFields);
 
         String[][] tvZodFields = {id, mapper, tvShow, tagLine, season,
-                    episode, year, releaseDate, createDate, modifyDate};
+                    episode, year, releaseDate, createDate, modifyDate, rating};
         fieldsTables.put(TAG_TV_ZOD, tvZodFields);
 
         String[][] summaryFields = {id , mapper, summary, createDate, modifyDate};
@@ -126,6 +130,9 @@ public class API
                                     videoBirate, resolutionX, resolutionY, audioCodec, audioBitrate,
                                     channel, createDate, modifyDate};
         fieldsTables.put(TAG_VIDEO_FILE,videoFileFields);
+
+        String[][] genreFields = {id, mapper, genre, createDate, modifyDate};
+        fieldsTables.put(TAG_GENRE, genreFields);
 
 
     }
@@ -153,6 +160,10 @@ public class API
 
     public void updateVideoFile(){
         new GetData(TAG_VIDEO_FILE).execute();
+    }
+
+    public void updateGenre() {
+        new GetData(TAG_GENRE).execute();
     }
 
     /**
