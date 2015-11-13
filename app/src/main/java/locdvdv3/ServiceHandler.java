@@ -4,16 +4,15 @@ package locdvdv3;
  * Created by dada on 27/10/2015.
  */
 
+import android.content.ContentValues;
 import android.content.Context;
-
-import org.apache.http.NameValuePair;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
-import java.util.List;
 
 
 public class ServiceHandler {
@@ -21,6 +20,7 @@ public class ServiceHandler {
     static String response = "";
     public final static int GET = 1;
     public final static int POST = 2;
+    private static final String USER_AGENT = "Mozilla/5.0";
 
     public static final String API_URL = "http://pc-dada.home/api-locdvd/app_dev.php";
     private Context context;
@@ -46,24 +46,51 @@ public class ServiceHandler {
      * @params - http request params
      * */
     public String makeServiceCall(String request, int method,
-                                  List<NameValuePair> params) {
-        URL httpConnection = null;
-        URLConnection yc = null;
+                                  ContentValues params) {
 
         try {
 
-            httpConnection = new URL(API_URL+request);
-            yc = httpConnection.openConnection();
-            BufferedReader in;
-            String inputLine;
-            in = new BufferedReader(
-                    new InputStreamReader(
-                            yc.getInputStream()));
-            while ((inputLine = in.readLine()) != null)
-                response +=inputLine;
-            in.close();
+            URL obj = new URL(API_URL + request);
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
-            return response;
+            con.setRequestProperty("User-Agent", USER_AGENT);
+
+            if (method == ServiceHandler.POST) {
+                con.setRequestMethod("POST");
+                con.setRequestProperty("Content-Type", "application/json");
+                // For POST only - START
+                con.setDoOutput(true);
+                OutputStream os = con.getOutputStream();
+
+                String urlParams = "{\"ids\":"+params.get("ids").toString()+"}";
+
+                os.write(urlParams.getBytes());
+                os.flush();
+                os.close();
+                // For POST only - END
+            }else {
+                con.setRequestMethod("GET");
+            }
+
+            int responseCode = con.getResponseCode();
+            System.out.println("POST Response Code :: " + responseCode);
+
+            if (responseCode == HttpURLConnection.HTTP_OK) { //success
+                BufferedReader in = new BufferedReader(new InputStreamReader(
+                        con.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                // print result
+               return response.toString();
+            } else {
+                System.out.println("request not worked");
+            }
 
         } catch (IOException e) {
             e.printStackTrace();

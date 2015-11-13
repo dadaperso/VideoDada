@@ -9,6 +9,9 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
+import locdvdv3.API;
+import locdvdv3.DatabaseMedia;
+
 
 public class SplashScreen extends Activity {
 
@@ -18,7 +21,7 @@ public class SplashScreen extends Activity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case SPLASH_STOP:
-                    Intent intent = new Intent(SplashScreen.this, DataConstruction.class);
+                    Intent intent = new Intent(SplashScreen.this, Main2Activity.class);
                     startActivity(intent);
                     finish();
                     break;
@@ -39,5 +42,23 @@ public class SplashScreen extends Activity {
         splashHandler.sendMessageDelayed(msg, SPLASH_TIME);
         Animation anim = AnimationUtils.loadAnimation(this, R.anim.anim);
         splash.setAnimation(anim);
+
+        DatabaseMedia databaseMedia = new DatabaseMedia(getBaseContext());
+
+        API api = new API(databaseMedia, this);
+
+        api.updateMovie();
+
+        api.updateTvShow();
+
+        api.updateSummary();
+
+        api.updateActor();
+
+        api.updateMapper();
+
+        api.updateVideoFile();
+
+
     }
 }

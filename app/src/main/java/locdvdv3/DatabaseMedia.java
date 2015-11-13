@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import org.json.JSONArray;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -316,7 +318,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
 
             try {
                 movie.setOriginallyAvailable(date.parse(result.getString(5)));
-            } catch (ParseException e) {
+            } catch (ParseException|NullPointerException e ) {
                 e.printStackTrace();
             }
 
@@ -729,5 +731,55 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         }
 
         return videoFile;
+    }
+
+    public int getCountAllByTable(String table) {
+        int nbRows = 0;
+
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String[] columns ={"COUNT(id)"};
+
+        Cursor result = db.query(table, columns, null, null, null, null, null);
+        result.moveToFirst();
+
+        while (!result.isAfterLast()){
+            nbRows = result.getInt(0);
+            result.moveToNext();
+        }
+
+        result.close();
+
+        return nbRows;
+    }
+
+    public ArrayList<Integer> getAllIdByTable(String table) {
+        ArrayList<Integer> ids = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String[] columns = {"id"};
+        Cursor result = db.query(table, columns, null, null, null, null, null);
+
+        result.moveToFirst();
+
+        while (!result.isAfterLast()){
+            ids.add(result.getInt(0));
+            result.moveToNext();
+        }
+        result.close();
+
+        return ids;
+    }
+
+    public void deleteData(String table, JSONArray data) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        String ids = data.toString().replace('[', ' ').replace(']', ' ');
+
+        String   where = "id IN (?)";
+        String[] whereArg = {ids};
+        db.delete(table,where,whereArg);
     }
 }

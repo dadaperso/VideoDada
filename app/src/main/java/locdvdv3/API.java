@@ -3,16 +3,14 @@ package locdvdv3;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
-
-import com.example.dada.res1.Main2Activity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,7 +62,8 @@ public class API
 
 
     // movies JSONArray
-    JSONArray data = null;
+    JSONArray  data   = null;
+    JSONObject entity = null;
 
     public API(DatabaseMedia databaseMedia, Context context) {
         this.dbMedia = databaseMedia;
@@ -159,7 +158,7 @@ public class API
     /**
      * Async task class to get json by making HTTP call
      * */
-    private class GetData extends AsyncTask<Void, Void, Void> {
+    private class GetData extends AsyncTask<Void, Void, Integer> {
 
         private String type;
 
@@ -171,16 +170,16 @@ public class API
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            // Showing progress dialog
+            /*// Showing progress dialog
             pDialog = new ProgressDialog(context);
             pDialog.setMessage("Please wait...");
             pDialog.setCancelable(false);
-            pDialog.show();
+            pDialog.show();*/
 
         }
 
         @Override
-        protected Void doInBackground(Void... arg0) {
+        protected Integer doInBackground(Void... arg0) {
             // Creating service handler class instance
             ServiceHandler sh = new ServiceHandler(context);
 
@@ -195,7 +194,7 @@ public class API
                 urlQuery+= "&lastUpdate="+lastUpdate;
             }
 
-            Log.d("Query: ", "> "+urlQuery);
+            Log.d("Query: ", "> " + urlQuery);
 
             String jsonStr = sh.makeServiceCall(urlQuery, ServiceHandler.GET);
 
@@ -204,58 +203,67 @@ public class API
             if (jsonStr != null) try {
                 JSONObject jsonObj = new JSONObject(jsonStr);
 
-                // Getting JSON Array node
-                data = jsonObj.getJSONObject("update").getJSONArray(this.type);
 
-                // TODO add progres bar
+                entity = jsonObj.getJSONObject(this.type);
 
-                String[][] fieldsTable = fieldsTables.get(this.type);
-                // looping through All Contacts
-                for (int i = 0; i < data.length(); i++) {
-                    ContentValues values = new ContentValues();
+                if (entity.getInt("nbUpDate")>0){
+                    // Getting JSON Array node
+                    data = entity.getJSONArray("data");
 
-                    try{
+                    // TODO add progres bar
+                    String[][] fieldsTable = fieldsTables.get(this.type);
+                    // looping through All Contacts
+                    for (int i = 0; i < data.length(); i++) {
+                        ContentValues values = new ContentValues();
 
-                        JSONObject d = data.getJSONObject(i);
+                        try{
 
-                        for (String[] field: fieldsTable){
-                           try {
-                               String type = field[1];
-                               String name = field[0];
+                            JSONObject d = data.getJSONObject(i);
 
-                               String value;
-                               int valueInt;
+                            for (String[] field: fieldsTable){
+                                try {
+                                    String type = field[1];
+                                    String name = field[0];
 
-                               switch (type){
-                                   case "string":
-                                       value = d.getString(name);
-                                       values.put(name, value);
-                                       break;
-                                   case "int":
-                                       valueInt = d.getInt(name);
-                                       values.put(name, valueInt);
-                                       break;
-                                   case "object":
-                                       JSONObject object = d.getJSONObject(name);
-                                       valueInt = object.getInt("id");
-                                       values.put(name+"_id", valueInt);
-                               }
+                                    String value;
+                                    int valueInt;
+
+                                    switch (type){
+                                        case "string":
+                                            value = d.getString(name);
+                                            values.put(name, value);
+                                            break;
+                                        case "int":
+                                            valueInt = d.getInt(name);
+                                            values.put(name, valueInt);
+                                            break;
+                                        case "object":
+                                            JSONObject object = d.getJSONObject(name);
+                                            valueInt = object.getInt("id");
+                                            values.put(name+"_id", valueInt);
+                                    }
 
 
-                           }catch (JSONException e){
-                               e.printStackTrace();
-                           }
+                                }catch (JSONException e){
+                                    e.printStackTrace();
+                                }
 
+                            }
+
+                            // Add into DataBase
+                            dbMedia.updateData(dbMedia.getWritableDatabase(),table,  values);
+                            // progressHandler.sendMessage(progressHandler.obtainMessage());
+                        }catch (JSONException e){
+                            e.printStackTrace();
                         }
 
-                        // Add into DataBase
-                        dbMedia.updateData(dbMedia.getWritableDatabase(),table,  values);
-                    // progressHandler.sendMessage(progressHandler.obtainMessage());
-                    }catch (JSONException e){
-                        e.printStackTrace();
                     }
-
                 }
+
+                return entity.getInt("nbTotal");
+
+
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -267,17 +275,227 @@ public class API
         }
 
         @Override
-        protected void onPostExecute(Void result) {
+        protected void onPostExecute(Integer result) {
             super.onPostExecute(result);
             // Dismiss the progress dialog
-            if (pDialog.isShowing())
+            /*if (pDialog.isShowing())
                 pDialog.dismiss();
+                */
             /**
              * Updating parsed JSON data into ListView
              * */
-            Intent intent = new Intent(context, Main2Activity.class);
-            //Intent intent = new Intent(DataConstruction.this, LocDVD.class);
-            context.startActivity(intent);
+
+            String table = dbMedia.getTagToTable(this.type);
+
+            int nbRows = dbMedia.getCountAllByTable(table);
+
+            if(result != null && result != nbRows){
+                ArrayList<Integer> ids = dbMedia.getAllIdByTable(table);
+
+                data = new JSONArray(ids);
+
+                ContentValues params = new ContentValues();
+                params.put("ids", data.toString());
+
+                new PutData(this.type,params).execute();
+
+            }
+
+        }
+
+    }
+
+    private class PutData extends AsyncTask<Void, Void, Integer> {
+
+        private ContentValues params;
+        private String type;
+
+        public PutData(String type, ContentValues params) {
+
+            this.type = type;
+            this.params = params;
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+           super.onPreExecute();
+           // TODO use WeakReference to acess Activity
+            /*
+            // Showing progress dialog
+            pDialog = new ProgressDialog(context);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();*/
+
+        }
+
+        @Override
+        protected Integer doInBackground(Void... arg0) {
+            // Creating service handler class instance
+            ServiceHandler sh = new ServiceHandler(context);
+
+            String table = dbMedia.getTagToTable(this.type);
+
+            // Making a request to url and getting response
+            String urlQuery = "/update/maj.json?entities[]="+this.type;
+
+            Log.d("Query: ", "> " + urlQuery);
+
+            String jsonStr = sh.makeServiceCall(urlQuery, ServiceHandler.POST, this.params);
+
+            Log.d("Response: ", "> " + jsonStr);
+
+            if (jsonStr != null) try {
+                JSONObject jsonObj = new JSONObject(jsonStr);
+
+
+                entity = jsonObj.getJSONObject(this.type);
+
+                String[][] fieldsTable = fieldsTables.get(this.type);
+
+                if(entity.getInt("nbMissing")> 0) {
+                    data = entity.getJSONObject("data").getJSONArray("missing");
+
+                    for (int i = 0; i < data.length(); i++) {
+                        ContentValues values = new ContentValues();
+
+                        try {
+
+                            JSONObject d = data.getJSONObject(i);
+
+                            for (String[] field : fieldsTable) {
+                                try {
+                                    String type = field[1];
+                                    String name = field[0];
+
+                                    String value;
+                                    int valueInt;
+
+                                    switch (type) {
+                                        case "string":
+                                            value = d.getString(name);
+                                            values.put(name, value);
+                                            break;
+                                        case "int":
+                                            valueInt = d.getInt(name);
+                                            values.put(name, valueInt);
+                                            break;
+                                        case "object":
+                                            JSONObject object = d.getJSONObject(name);
+                                            valueInt = object.getInt("id");
+                                            values.put(name + "_id", valueInt);
+                                    }
+
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+
+                            // Add into DataBase
+                            dbMedia.updateData(dbMedia.getWritableDatabase(), table, values);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                if (entity.getInt("nbDelete") > 0){
+                    data = entity.getJSONObject("data").getJSONArray("delete");
+                    dbMedia.deleteData(table,data);
+
+                }
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
+
+
+
+                /*if (entity.getInt("nbUpdate")>0){
+                    // Getting JSON Array node
+                    data = entity.getJSONArray("data");
+
+                    // TODO add progres bar
+                    String[][] fieldsTable = fieldsTables.get(this.type);
+                    // looping through All Contacts
+                    for (int i = 0; i < data.length(); i++) {
+                        ContentValues values = new ContentValues();
+
+                        try{
+
+                            JSONObject d = data.getJSONObject(i);
+
+                            for (String[] field: fieldsTable){
+                                try {
+                                    String type = field[1];
+                                    String name = field[0];
+
+                                    String value;
+                                    int valueInt;
+
+                                    switch (type){
+                                        case "string":
+                                            value = d.getString(name);
+                                            values.put(name, value);
+                                            break;
+                                        case "int":
+                                            valueInt = d.getInt(name);
+                                            values.put(name, valueInt);
+                                            break;
+                                        case "object":
+                                            JSONObject object = d.getJSONObject(name);
+                                            valueInt = object.getInt("id");
+                                            values.put(name+"_id", valueInt);
+                                    }
+
+
+                                }catch (JSONException e){
+                                    e.printStackTrace();
+                                }
+
+                            }
+
+                            // Add into DataBase
+                            dbMedia.updateData(dbMedia.getWritableDatabase(),table,  values);
+                            // progressHandler.sendMessage(progressHandler.obtainMessage());
+                        }catch (JSONException e){
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+
+                int nbRows = dbMedia.getCountAllByTable(table);
+
+                if(nbRows != entity.getInt("nbAll")){
+                    ArrayList<Integer> ids = dbMedia.getAllIdByTable(table);
+
+                    data = new JSONArray(ids);
+
+
+                }
+*/
+
+
+            else {
+                Log.e("ServiceHandler", "Couldn't get any data from the url");
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+           /* if (pDialog.isShowing())
+                pDialog.dismiss();*/
+            /**
+             * Updating parsed JSON data into ListView
+             * */
+
         }
 
     }
