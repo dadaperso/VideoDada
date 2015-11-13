@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Res1</string>
+    <string name="app_name">VideoStation - Dada</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -46,7 +46,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="locdvd_action_video_propriety">Video properties</string>
-    <string name="locdvd_file_path">Fille path :</string>
+    <string name="locdvd_file_path">File path :</string>
     <string name="locdvd_file_size">File size :</string>
     <string name="locdvd_file_duration">Duration :</string>
     <string name="locdvd_resolution">Resolution :</string>
@@ -56,6 +56,11 @@
     <string name="locdvd_file_audio_codec">Audio Codex :</string>
     <string name="locdvd_file_audio_bitrate">Audio Bitrate :</string>
     <string name="locdvd_file_channel">Channel :</string>
+    <string name="locdvd_movie_releasedate">Release Date: %s</string>
+    <string name="locdvd_movie_duration">Duration: %s</string>
+    <string name="locdvd_movie_genre">Genre: %s</string>
+    <string name="locdvd_movie_real">Realisator: %s</string>
+    <string name="locdvd_movie_rating">Rating: $s</string>
 
 
 </resources>
