@@ -28,8 +28,6 @@ import com.dada.videstation.utils.DatabaseMedia;
 import com.dada.videstation.utils.StringConversion;
 import com.example.dada.res1.R;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class DetailMovieActivity extends AppCompatActivity
@@ -84,15 +82,7 @@ public class DetailMovieActivity extends AppCompatActivity
                 R.string.locdvd_movie_real), ""));
 
         TextView txtReleaseDate = (TextView) findViewById(R.id.txtDateSortieFiche);
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        String releaseDate;
-        try {
-            releaseDate = df.format(movie.getOriginallyAvailable());
-        }catch (NullPointerException e){
-            releaseDate = "0000-00-00";
-            e.printStackTrace();
-        }
-
+        String releaseDate = StringConversion.dateToString(movie.getOriginallyAvailable());
         txtReleaseDate.setText(String.format(getResources().getString(
                 R.string.locdvd_movie_releasedate),releaseDate));
 

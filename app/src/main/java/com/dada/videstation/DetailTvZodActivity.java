@@ -21,15 +21,18 @@ import android.widget.TextView;
 
 import com.dada.videstation.model.Actor;
 import com.dada.videstation.model.TvZod;
+import com.dada.videstation.model.VideoFile;
 import com.dada.videstation.utils.API;
 import com.dada.videstation.utils.DatabaseMedia;
+import com.dada.videstation.utils.StringConversion;
 import com.example.dada.res1.R;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class DetailTvZodActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    VideoFile mVideoFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,13 +82,8 @@ public class DetailTvZodActivity extends AppCompatActivity
 
 
         TextView txtTvZodRelaseDate = (TextView) findViewById(R.id.txtTvZodReleaseDate);
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        try {
-            txtTvZodRelaseDate.setText(df.format(zod.getReleaseDate()));
-        }catch (NullPointerException e){
-            e.printStackTrace();
-            txtTvZodRelaseDate.setText("0000-00-00");
-        }
+        String releaseDate = StringConversion.dateToString(zod.getReleaseDate());
+        txtTvZodRelaseDate.setText(releaseDate);
 
         final LinearLayout actorGroup = (LinearLayout) findViewById(R.id.tvZodActors);
 

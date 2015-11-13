@@ -1,5 +1,8 @@
 package com.dada.videstation.utils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by dada on 13/11/2015.
  */
@@ -23,5 +26,21 @@ public class StringConversion
         int hours = totalMinutes / MINUTES_IN_AN_HOUR;
 
         return hours + "h" + minutes+"m";
+    }
+
+    public static String dateToString(Date date){
+        String strDate;
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            strDate = df.format(date);
+
+        }catch (NullPointerException e){
+            e.printStackTrace();
+            strDate = "0000-00-00";
+        }
+
+        return strDate;
+
     }
 }

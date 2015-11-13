@@ -14,10 +14,9 @@ import com.dada.videstation.DetailMovieActivity;
 import com.dada.videstation.model.Movie;
 import com.dada.videstation.model.ViewHolder;
 import com.dada.videstation.utils.DatabaseMedia;
+import com.dada.videstation.utils.StringConversion;
 import com.example.dada.res1.R;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 
@@ -74,17 +73,9 @@ public class FilmAdapter extends BaseAdapter {
 
         Movie film = (Movie) getItem(position);
 
-
         holder.txtTitle.setText(film.getTitle());
 
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-
-        try{
-            holder.txtReleaseDate.setText(df.format(film.getOriginallyAvailable()));
-        }catch (NullPointerException e){
-            e.printStackTrace();
-            holder.txtReleaseDate.setText("0000-00-00");
-        }
+        holder.txtReleaseDate.setText(StringConversion.dateToString(film.getOriginallyAvailable()));
 
         //holder.imgAffiche.setImageResource(film.getiImg());
 

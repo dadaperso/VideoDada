@@ -13,10 +13,9 @@ import android.widget.Toast;
 import com.dada.videstation.DetailTvShowActivity;
 import com.dada.videstation.model.Tvshow;
 import com.dada.videstation.model.ViewHolder;
+import com.dada.videstation.utils.StringConversion;
 import com.example.dada.res1.R;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 /**
@@ -55,14 +54,7 @@ public class TvShowAdapter extends ArrayAdapter<Tvshow> {
 
         holder.txtTitle.setText(tvshow.getTitle());
 
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-
-        try{
-            holder.txtReleaseDate.setText(df.format(tvshow.getReleaseDate()));
-        }catch (NullPointerException e){
-            e.printStackTrace();
-            holder.txtReleaseDate.setText("0000-00-00");
-        }
+        holder.txtReleaseDate.setText(StringConversion.dateToString(tvshow.getReleaseDate()));
 
         //holder.imgAffiche.setImageResource(film.getiImg());
 
