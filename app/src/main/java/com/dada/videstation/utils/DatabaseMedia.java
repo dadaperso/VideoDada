@@ -228,9 +228,6 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         }
 
         result.close();
-
-        db.close();
-
         return lastUpdate;
     }
 
@@ -737,6 +734,8 @@ public class DatabaseMedia extends SQLiteOpenHelper {
 
             result.moveToNext();
         }
+
+        result.close();
 
         return videoFile;
     }

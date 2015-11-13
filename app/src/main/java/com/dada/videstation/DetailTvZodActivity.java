@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -63,6 +64,8 @@ public class DetailTvZodActivity extends AppCompatActivity
 
         DatabaseMedia dbMedia = DatabaseMedia.getInstance(this);
 
+        mVideoFile = dbMedia.getVideoFileByMapper(zod.getMapper());
+
         String title = zod.getTvshow().getTitle()+" S"+zod.getSaison()+"E"+zod.getEpisode();
         setTitle(title);
 
@@ -80,10 +83,15 @@ public class DetailTvZodActivity extends AppCompatActivity
         String lblZod = res.getString(R.string.locdvd_tv_zod_episode);
         txtTvZodEpisode.setText(String.format(lblZod,zod.getEpisode()));
 
-
         TextView txtTvZodRelaseDate = (TextView) findViewById(R.id.txtTvZodReleaseDate);
         String releaseDate = StringConversion.dateToString(zod.getReleaseDate());
-        txtTvZodRelaseDate.setText(releaseDate);
+        txtTvZodRelaseDate.setText(String.format(getResources().getString(
+                R.string.locdvd_movie_releasedate),releaseDate));
+
+        TextView txtTvZodDuration = (TextView) findViewById(R.id.txtTvZodDuration);
+        txtTvZodDuration.setText(String.format(getString(R.string.locdvd_movie_duration),
+                StringConversion.timeConversion(mVideoFile.getDuration())));
+
 
         final LinearLayout actorGroup = (LinearLayout) findViewById(R.id.tvZodActors);
 
@@ -172,7 +180,7 @@ public class DetailTvZodActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.detail_tv_zod, menu);
+        getMenuInflater().inflate(R.menu.detail_item, menu);
         return true;
     }
 
@@ -186,6 +194,12 @@ public class DetailTvZodActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }else if (id == R.id.action_video_propriety){
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(API.TAG_VIDEO_FILE, mVideoFile);
+            DialogFragment newFragment = new DetailVideoFileFragment();
+            newFragment.setArguments(bundle);
+            newFragment.show(getSupportFragmentManager(), "video_details");
         }
 
         return super.onOptionsItemSelected(item);

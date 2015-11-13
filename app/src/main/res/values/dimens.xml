@@ -10,4 +10,5 @@
     <dimen name="locdvd_file_detail_margin_bottom">5dp</dimen>
     <dimen name="locdvd_file_detail_margin_left">10dp</dimen>
     <dimen name="locdvd_file_detail_margin_top">15dp</dimen>
+    <dimen name="locdvd_zod_detail_margin_top">5dp</dimen>
 </resources>

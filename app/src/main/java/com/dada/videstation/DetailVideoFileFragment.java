@@ -44,9 +44,11 @@ public class DetailVideoFileFragment extends DialogFragment
                 .setText(mVideoFile.getResolutionx() + "x" + mVideoFile.getResolutiony());
         ((TextView)view.findViewById(R.id.txtDetailVideFileContainer)).setText(mVideoFile.getContainerType());
         ((TextView)view.findViewById(R.id.txtDetailVideFileVideoCodec)).setText(mVideoFile.getVideoCodec());
-        ((TextView)view.findViewById(R.id.txtDetailVideFileVideoBitrate)).setText(mVideoFile.getVideoBitrate()+"b/s");
+        ((TextView)view.findViewById(R.id.txtDetailVideFileVideoBitrate)).setText(
+                StringConversion.humanReadableByteCount((long)mVideoFile.getVideoBitrate(),true)+"/s");
         ((TextView)view.findViewById(R.id.txtDetailVideFileAudioCodec)).setText(mVideoFile.getAudioCodec());
-        ((TextView)view.findViewById(R.id.txtDetailVideFileAudioBitrate)).setText(mVideoFile.getAudioBitrate()+"b/s");
+        ((TextView)view.findViewById(R.id.txtDetailVideFileAudioBitrate)).setText(
+                StringConversion.humanReadableByteCount((long)mVideoFile.getAudioBitrate(),true)+"/s");
         ((TextView)view.findViewById(R.id.txtDetailVideFileChannel))
                 .setText(Integer.toString(mVideoFile.getChannel()));
 

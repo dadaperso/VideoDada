@@ -14,12 +14,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
+import android.widget.TextView;
 
 import com.dada.videstation.adapter.TvShowZodAdapter;
 import com.dada.videstation.model.TvZod;
 import com.dada.videstation.model.Tvshow;
 import com.dada.videstation.utils.API;
 import com.dada.videstation.utils.DatabaseMedia;
+import com.dada.videstation.utils.StringConversion;
 import com.example.dada.res1.R;
 
 import java.util.ArrayList;
@@ -60,9 +62,17 @@ public class DetailTvShowActivity extends AppCompatActivity
 
         setTitle(tvshow.getTitle());
 
-        // TODO getSummary
+        TextView txtReleaseDate = (TextView) findViewById(R.id.txtDateSortieFiche);
+        String releaseDate = StringConversion.dateToString(tvshow.getReleaseDate());
+        txtReleaseDate.setText(String.format(getResources().getString(
+                R.string.locdvd_movie_releasedate),releaseDate));
 
-        // TODO getZod
+        // TODO getSummary
+        DatabaseMedia dbMedia = DatabaseMedia.getInstance(this);
+        TextView txtSummary = (TextView) findViewById(R.id.txtResumerFiche);
+        txtSummary.setText(dbMedia.getSummaryByMapper(tvshow.getMapper()).getSummary());
+
+
         Object[] data = DatabaseMedia.getInstance(this).getTvZodByTvShow(tvshow, dataListZod, dataListSeason);
         dataListSeason = (ArrayList<String>) data[0];
         dataListZod = (HashMap<String, ArrayList<TvZod>>) data[1];

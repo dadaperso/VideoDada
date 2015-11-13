@@ -45,7 +45,7 @@
             android:layout_below="@id/txtTvZodSeason"
             android:layout_toRightOf="@id/imgTvZodImage"
             android:layout_toEndOf="@id/imgTvZodImage"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="@dimen/locdvd_zod_detail_margin_top"
             android:text="Zod" />
 
         <TextView
@@ -55,7 +55,7 @@
             android:layout_below="@id/txtTvZodEpisode"
             android:layout_toRightOf="@id/imgTvZodImage"
             android:layout_toEndOf="@id/imgTvZodImage"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="@dimen/locdvd_zod_detail_margin_top"
             android:text="Date" />
 
         <TextView
@@ -65,7 +65,7 @@
             android:layout_below="@id/txtTvZodReleaseDate"
             android:layout_toRightOf="@id/imgTvZodImage"
             android:layout_toEndOf="@id/imgTvZodImage"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="@dimen/locdvd_zod_detail_margin_top"
             android:text="Date" />
 
         <LinearLayout
