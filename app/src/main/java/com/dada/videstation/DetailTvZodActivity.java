@@ -92,6 +92,13 @@ public class DetailTvZodActivity extends AppCompatActivity
         txtTvZodDuration.setText(String.format(getString(R.string.locdvd_movie_duration),
                 StringConversion.timeConversion(mVideoFile.getDuration())));
 
+        TextView txtTvZodRating = (TextView) findViewById(R.id.txtTvZodRating);
+        if (zod.getRating() != null) {
+            txtTvZodRating.setVisibility(View.VISIBLE);
+            txtTvZodRating.setText(String.format(getString(R.string.locdvd_movie_rating), zod.getRating()));
+        }else {
+            txtTvZodRating.setVisibility(View.GONE);
+        }
 
         final LinearLayout actorGroup = (LinearLayout) findViewById(R.id.tvZodActors);
 

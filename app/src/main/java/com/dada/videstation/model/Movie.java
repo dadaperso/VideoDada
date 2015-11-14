@@ -17,6 +17,7 @@ public class Movie extends VideoFile implements Serializable {
     private Date originallyAvailable;
     private Date createDate;
     private Date modifyDate;
+    private String rating;
 
     public int getId() {
         return id;
@@ -86,5 +87,13 @@ public class Movie extends VideoFile implements Serializable {
     @Override
     public void setModifyDate(Date modifyDate) {
         this.modifyDate = modifyDate;
+    }
+
+    public String getRating() {
+        return rating;
+    }
+
+    public void setRating(String rating) {
+        this.rating = rating;
     }
 }

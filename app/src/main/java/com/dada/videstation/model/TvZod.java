@@ -8,7 +8,7 @@ import java.util.Date;
  */
 public class TvZod implements Serializable
 {
-    private String tagLine;
+    private String tagLine, rating;
     private int  id, saison, episode, year;
     private Date releaseDate, createDate, modifyDate;
     private Mapper mapper;
@@ -92,5 +92,13 @@ public class TvZod implements Serializable
 
     public void setTvshow(Tvshow tvshow) {
         this.tvshow = tvshow;
+    }
+
+    public String getRating() {
+        return rating;
+    }
+
+    public void setRating(String rating) {
+        this.rating = rating;
     }
 }

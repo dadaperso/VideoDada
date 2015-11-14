@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.dada.videstation.model.Actor;
+import com.dada.videstation.model.Genre;
 import com.dada.videstation.model.Movie;
 import com.dada.videstation.model.VideoFile;
 import com.dada.videstation.utils.API;
@@ -87,13 +88,80 @@ public class DetailMovieActivity extends AppCompatActivity
                 R.string.locdvd_movie_releasedate),releaseDate));
 
         TextView txtRating = (TextView) findViewById(R.id.txtClassifictionFiche);
-        txtRating.setText(String.format(getResources().getString(R.string.locdvd_movie_rating),""));
-        txtRating.setVisibility(View.GONE); //TODO implement certicicate field in table
+        if(!movie.getRating().equals("")){
+            txtRating.setVisibility(View.VISIBLE);
+            txtRating.setText(
+                    String.format(getResources().getString(R.string.locdvd_movie_rating)
+                    ,movie.getRating())
+            );
+        }else {
+            txtRating.setVisibility(View.GONE);
+        }
 
-        TextView txtGenre = (TextView) findViewById(R.id.txtGenreFiche);
+        final ArrayList<Genre> lstGenre = dbMedia.getGenreByMapper(movie.getMapper());
+        final TextView txtGenre = (TextView) findViewById(R.id.txtGenreFiche);
         // TODO implement genre table
         txtGenre.setText(String.format(getResources().getString(
                 R.string.locdvd_movie_genre),""));
+
+        final LinearLayout llGenre1 = (LinearLayout)findViewById(R.id.llGenre1);
+        llGenre1.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                // Ensure you call it only once :
+                if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    llGenre1.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+                else {
+                    llGenre1.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                }
+
+                //Dimmention layout
+                int width = llGenre1.getMeasuredWidth();
+                int currentWidth = txtGenre.getMeasuredWidth();
+                int i=0 ;
+                LinearLayout parentLayout = llGenre1, layout;
+                for (final Genre genre: lstGenre){
+                    TextView txtGenre = new TextView(DetailMovieActivity.this);
+
+                    i++;
+
+                    txtGenre.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            /*Intent intent = new Intent(DetailMovieActivity.this,DetailActorActivity.class);
+                            intent.putExtra("genre", genre);
+                            startActivity(intent);*/
+                        }
+                    });
+
+                    if (i < lstGenre.size()){
+                        txtGenre.setText(genre.getGenre()+ ", ");
+
+                    }else {
+                        txtGenre.setText(genre.getGenre());
+                    }
+
+                    txtGenre.measure(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                    currentWidth += txtGenre.getMeasuredWidth();
+
+                    // TODO add link to Actor activity on textView
+                    if(currentWidth > width ){
+                        layout = new LinearLayout(DetailMovieActivity.this);
+                        layout.setOrientation(LinearLayout.HORIZONTAL);
+                        layout.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                        parentLayout = layout;
+                        ((LinearLayout)llGenre1.getParent()).addView(parentLayout);
+                        width = txtGenre.getMeasuredWidth();
+                    }
+
+                    parentLayout.addView(txtGenre);
+                }
+
+
+
+            }
+        });
 
         TextView txtDuration = (TextView) findViewById(R.id.txtDureeFiche);
         String duration = StringConversion.timeConversion(mVideoFile.getDuration());

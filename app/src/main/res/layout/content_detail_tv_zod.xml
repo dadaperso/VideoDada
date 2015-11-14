@@ -66,7 +66,17 @@
             android:layout_toRightOf="@id/imgTvZodImage"
             android:layout_toEndOf="@id/imgTvZodImage"
             android:layout_marginTop="@dimen/locdvd_zod_detail_margin_top"
-            android:text="Date" />
+            android:text="Duration" />
+
+        <TextView
+            android:id="@+id/txtTvZodRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txtTvZodDuration"
+            android:layout_toRightOf="@id/imgTvZodImage"
+            android:layout_toEndOf="@id/imgTvZodImage"
+            android:layout_marginTop="@dimen/locdvd_zod_detail_margin_top"
+            android:text="Ratting" />
 
         <LinearLayout
             android:id="@+id/tvZodActors"

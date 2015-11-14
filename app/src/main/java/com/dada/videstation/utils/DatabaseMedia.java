@@ -4,10 +4,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.dada.videstation.model.Actor;
+import com.dada.videstation.model.Genre;
 import com.dada.videstation.model.Mapper;
 import com.dada.videstation.model.Movie;
 import com.dada.videstation.model.Summary;
@@ -284,7 +286,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         String[] columns = {API.TAG_ID, "mapper_id", API.TAG_TITLE, API.TAG_TAG_LINE, API.TAG_YEAR,
-                        API.TAG_RELEASE_DATE, API.TAG_CREATE_DATE, API.TAG_MODIFY_DATE};
+                        API.TAG_RELEASE_DATE, API.TAG_CREATE_DATE, API.TAG_MODIFY_DATE,API.TAG_RATING};
 
         Cursor result =  db.query(TABLE_MOVIE, columns, null, null, null, null, API.TAG_CREATE_DATE + " DESC");
 
@@ -354,6 +356,8 @@ public class DatabaseMedia extends SQLiteOpenHelper {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+
+            movie.setRating(result.getString(8));
 
             lstMovies.add(movie);
 
@@ -452,7 +456,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
 
         String columns1 = API.TAG_ID+", tvshow_id, mapper_id,"+ API.TAG_TAG_LINE+", "+ API.TAG_SEASON+
                 ","+ API.TAG_EPISODE+", "+ API.TAG_YEAR+", "+ API.TAG_RELEASE_DATE+", "+
-                API.TAG_CREATE_DATE+", "+ API.TAG_MODIFY_DATE;
+                API.TAG_CREATE_DATE+", "+ API.TAG_MODIFY_DATE+", "+API.TAG_RATING;
         String query = "SELECT "+columns1+" FROM "+TABLE_TV_ZOD+ " as zod"+
                       " WHERE zod.mapper_id IN ("+
                             " SELECT mapper_id FROM "+TABLE_ACTOR+
@@ -479,7 +483,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
 
                 currentTvShow = result.getInt(1);
                 String[] columns = {API.TAG_ID, "mapper_id", API.TAG_TITLE, API.TAG_YEAR,
-                        API.TAG_RELEASE_DATE, API.TAG_CREATE_DATE, API.TAG_MODIFY_DATE};
+                        API.TAG_RELEASE_DATE, API.TAG_CREATE_DATE, API.TAG_MODIFY_DATE,};
                 String where = "id=?";
                 String[] whereArgs = {Integer.toString(currentTvShow)};
                 Cursor result2 = db.query(TABLE_TV_SHOW, columns, where, whereArgs, null, null, null);
@@ -526,7 +530,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         String[] columns = {API.TAG_ID, "tvshow_id", "mapper_id", API.TAG_TAG_LINE, API.TAG_SEASON,
                         API.TAG_EPISODE, API.TAG_YEAR, API.TAG_RELEASE_DATE, API.TAG_CREATE_DATE,
-                        API.TAG_MODIFY_DATE};
+                        API.TAG_MODIFY_DATE, API.TAG_RATING};
         String where = "tvshow_id=?";
         String[] whereArgs = {Integer.toString(tvshow.getId())};
         String order = API.TAG_SEASON+" ASC, "+API.TAG_EPISODE+" ASC";
@@ -611,6 +615,8 @@ public class DatabaseMedia extends SQLiteOpenHelper {
             e.printStackTrace();
         }
 
+        tvZod.setRating(result.getString(10));
+
         return tvZod;
 
     }
@@ -650,25 +656,9 @@ public class DatabaseMedia extends SQLiteOpenHelper {
 
             tvshow.setTitle(cursor.getString(2));
             tvshow.setYear(cursor.getInt(3));
-
-            try {
-                tvshow.setReleaseDate(date.parse(cursor.getString(4)));
-            } catch (ParseException|NullPointerException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                tvshow.setCreateDate(date.parse(cursor.getString(5)));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                tvshow.setModifyDate(date.parse(cursor.getString(6)));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
+            tvshow.setReleaseDate(StringConversion.stringToDate(cursor.getString(4)));
+            tvshow.setCreateDate(StringConversion.stringToDate(cursor.getString(5)));
+            tvshow.setModifyDate(StringConversion.stringToDate(cursor.getString(6)));
 
         return tvshow;
     }
@@ -817,32 +807,42 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         String   where = "mapper_id IN ("+whereArg+")";
         String   whereMapper = "id IN ("+whereArg+")";
 
-        Log.d("delteData", "delete from "+table+" where mapper_id IN ("+whereArg+")");
+        Log.d("delteData", "delete from " + table + " where mapper_id IN (" + whereArg + ")");
 
         // debut transaction for delete child of Entity
-       // db.beginTransaction();
-        //delelte genre, actor, summary, mapper, videofile MAPPER_ID ?
-        int resultG = db.delete(TABLE_GENRE, where,null);
-        Log.d("delteData", "delete from " + TABLE_GENRE + " where mapper_id IN (" + whereArg + ")");
-        Log.d("delteData", "result:" + resultG + " row affected");
-        int resultA = db.delete(TABLE_ACTOR, where, null);
-        Log.d("delteData", "delete from " + TABLE_ACTOR + " where mapper_id IN (" + whereArg + ")");
-        Log.d("delteData", "result:" + resultA + " row affected");
-        int resultS = db.delete(TABLE_SUMMARY, where, null);
-        Log.d("delteData", "delete from " + TABLE_SUMMARY + " where mapper_id IN (" + whereArg + ")");
-        Log.d("delteData", "result:" + resultS + " row affected");
-        int resultV = db.delete(TABLE_VIDEO_FILE, where, null);
-        Log.d("delteData", "delete from " + TABLE_VIDEO_FILE + " where mapper_id IN (" + whereArg + ")");
-        Log.d("delteData", "result:" + resultV + " row affected");
-        int resultE = db.delete(table, where, null);
-        Log.d("delteData", "delete from " + table + " where mapper_id IN (" + whereArg + ")");
-        Log.d("delteData", "result:" + resultE + " row affected");
-        int resultMap = db.delete(TABLE_MAPPER, whereMapper, null);
-        Log.d("delteData", "delete from " + TABLE_MAPPER + " where id IN (" + whereArg + ")");
-        Log.d("delteData", "result:"+resultMap+" row affected");
 
-       /* db.setTransactionSuccessful();
-        db.endTransaction();*/
+        try{
+            db.beginTransaction();
+
+            //delelte genre, actor, summary, mapper, videofile MAPPER_ID ?
+            int resultG = db.delete(TABLE_GENRE, where,null);
+            Log.d("delteData", "delete from " + TABLE_GENRE + " where mapper_id IN (" + whereArg + ")");
+            Log.d("delteData", "result:" + resultG + " row affected");
+            int resultA = db.delete(TABLE_ACTOR, where, null);
+            Log.d("delteData", "delete from " + TABLE_ACTOR + " where mapper_id IN (" + whereArg + ")");
+            Log.d("delteData", "result:" + resultA + " row affected");
+            int resultS = db.delete(TABLE_SUMMARY, where, null);
+            Log.d("delteData", "delete from " + TABLE_SUMMARY + " where mapper_id IN (" + whereArg + ")");
+            Log.d("delteData", "result:" + resultS + " row affected");
+            int resultV = db.delete(TABLE_VIDEO_FILE, where, null);
+            Log.d("delteData", "delete from " + TABLE_VIDEO_FILE + " where mapper_id IN (" + whereArg + ")");
+            Log.d("delteData", "result:" + resultV + " row affected");
+            int resultE = db.delete(table, where, null);
+            Log.d("delteData", "delete from " + table + " where mapper_id IN (" + whereArg + ")");
+            Log.d("delteData", "result:" + resultE + " row affected");
+            int resultMap = db.delete(TABLE_MAPPER, whereMapper, null);
+            Log.d("delteData", "delete from " + TABLE_MAPPER + " where id IN (" + whereArg + ")");
+            Log.d("delteData", "result:" + resultMap+" row affected");
+
+            db.setTransactionSuccessful();
+
+        }catch (SQLiteException e){
+            e.printStackTrace();
+        }finally{
+            db.endTransaction();
+        }
+
+
     }
 
     private int getMapperIdByEntityId(int id, String table) {
@@ -862,5 +862,43 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         }
 
         return mapper_id;
+    }
+
+    public ArrayList<Genre> getGenreByMapper(Mapper mapper) {
+        ArrayList<Genre> lstGenre = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String[] columns= {API.TAG_ID,API.TAG_MAPPER_ID,API.TAG_GENRE,API.TAG_CREATE_DATE,
+                            API.TAG_MODIFY_DATE};
+        String where = API.TAG_MAPPER_ID+"=?";
+        String[] whereArgs = {Integer.toString(mapper.getId())};
+
+        Cursor result = db.query(TABLE_GENRE, columns,where,whereArgs,null,null,null);
+
+        Genre genre;
+        result.moveToFirst();
+        while (!result.isAfterLast()) {
+            genre = hydrateGenre(result);
+            genre.setMapper(mapper);
+
+            lstGenre.add(genre);
+
+            result.moveToNext();
+        }
+        result.close();
+
+        return lstGenre;
+    }
+
+    private Genre hydrateGenre(Cursor result) {
+        Genre genre = new Genre();
+
+        genre.setId(result.getInt(0));
+        genre.setGenre(result.getString(2));
+        genre.setCreateDate(StringConversion.stringToDate(result.getString(3)));
+        genre.setModifyDate(StringConversion.stringToDate(result.getString(4)));
+
+        return genre;
     }
 }

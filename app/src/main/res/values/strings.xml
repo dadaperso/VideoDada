@@ -60,7 +60,7 @@
     <string name="locdvd_movie_duration">Duration: %s</string>
     <string name="locdvd_movie_genre">Genre: %s</string>
     <string name="locdvd_movie_real">Realisator: %s</string>
-    <string name="locdvd_movie_rating">Rating: $s</string>
+    <string name="locdvd_movie_rating">Rating: %s</string>
 
 
 </resources>

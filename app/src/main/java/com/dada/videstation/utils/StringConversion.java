@@ -1,5 +1,7 @@
 package com.dada.videstation.utils;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -42,5 +44,18 @@ public class StringConversion
 
         return strDate;
 
+    }
+
+    public static Date stringToDate(String strDate){
+
+        DateFormat date = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ");
+
+        try {
+            return date.parse(strDate);
+        } catch (ParseException|NullPointerException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }
