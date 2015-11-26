@@ -33,6 +33,11 @@
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
+            android:name="com.dada.videstation.DetailMovieActivity2"
+            android:label="@string/title_activity_detail_item"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
+        <activity
             android:name="com.dada.videstation.DetailActorActivity"
             android:label="@string/title_activity_actor"
             android:theme="@style/AppTheme.NoActionBar" >
@@ -55,6 +60,11 @@
         <activity
             android:name="com.dada.videstation.ActorActivity"
             android:label="@string/title_activity_actor"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
+        <activity
+            android:name="com.dada.videstation.SearchActivity"
+            android:label="@string/title_activity_search_ativity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
     </application>

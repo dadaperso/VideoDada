@@ -18,6 +18,7 @@
             android:layout_marginStart="@dimen/locdvd_file_detail_margin_left"
             android:layout_marginTop="@dimen/locdvd_file_detail_margin_top"
 
+
             />
          <TextView
              android:id="@+id/txtDetailVideFilePath"

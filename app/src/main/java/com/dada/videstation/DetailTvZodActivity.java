@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.dada.videstation.model.Actor;
+import com.dada.videstation.model.Genre;
 import com.dada.videstation.model.TvZod;
 import com.dada.videstation.model.VideoFile;
 import com.dada.videstation.utils.API;
@@ -99,6 +100,66 @@ public class DetailTvZodActivity extends AppCompatActivity
         }else {
             txtTvZodRating.setVisibility(View.GONE);
         }
+
+        // TODO add genre
+        final TextView txtGenre = (TextView) findViewById(R.id.lblTvZodGenre);
+        final ArrayList<Genre> lstGenre = dbMedia.getGenreByMapper(zod.getMapper());
+
+        final LinearLayout llGenre1 = (LinearLayout)findViewById(R.id.llTvZodGenre1);
+        llGenre1.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                // Ensure you call it only once :
+                if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    llGenre1.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+                else {
+                    llGenre1.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                }
+
+                //Dimmention layout
+                int width = llGenre1.getMeasuredWidth();
+                int currentWidth = txtGenre.getMeasuredWidth();
+                int i=0 ;
+                LinearLayout parentLayout = llGenre1, layout;
+                for (final Genre genre: lstGenre){
+                    TextView txtGenre = new TextView(DetailTvZodActivity.this);
+
+                    i++;
+
+                    txtGenre.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            /*Intent intent = new Intent(DetailMovieActivity.this,DetailActorActivity.class);
+                            intent.putExtra("genre", genre);
+                            startActivity(intent);*/
+                        }
+                    });
+
+                    if (i < lstGenre.size()){
+                        txtGenre.setText(genre.getGenre()+ ", ");
+
+                    }else {
+                        txtGenre.setText(genre.getGenre());
+                    }
+
+                    txtGenre.measure(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                    currentWidth += txtGenre.getMeasuredWidth();
+
+                    // TODO add link to Actor activity on textView
+                    if(currentWidth > width ){
+                        layout = new LinearLayout(DetailTvZodActivity.this);
+                        layout.setOrientation(LinearLayout.HORIZONTAL);
+                        layout.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                        parentLayout = layout;
+                        ((LinearLayout)llGenre1.getParent()).addView(parentLayout);
+                        width = txtGenre.getMeasuredWidth();
+                    }
+
+                    parentLayout.addView(txtGenre);
+                }
+             }
+        });
 
         final LinearLayout actorGroup = (LinearLayout) findViewById(R.id.tvZodActors);
 

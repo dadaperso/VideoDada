@@ -43,7 +43,7 @@
         <item quantity="other">%d movies</item>
     </plurals>
 
-    <!-- TODO: Remove or change this placeholder text -->
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="locdvd_action_video_propriety">Video properties</string>
     <string name="locdvd_file_path">File path :</string>
@@ -61,6 +61,20 @@
     <string name="locdvd_movie_genre">Genre: %s</string>
     <string name="locdvd_movie_real">Realisator: %s</string>
     <string name="locdvd_movie_rating">Rating: %s</string>
+    <string name="title_activity_search">SearchActivity</string>
+    <string name="title_activity_search_ativity">SearchAtivity</string>
+    <string name="locdvd_type">Type</string>
+    <string name="locdvd_watched">Watched</string>
+    <string name="locdvd_watch">watch</string>
+    <string name="locdvd_not_watch">not watch</string>
+    <string name="locdvd_resulotion">Resolution :</string>
+    <string name="locdvd_hd_720">HD 720</string>
+    <string name="locdvd_hd_1080">HD 1080</string>
+    <string name="locdvd_sd">SD</string>
+    <string name="locdvd_audio">Audio :</string>
+    <string name="locdvd_audio_dts">DTS</string>
+    <string name="locdvd_audio_5_1">5.1</string>
+    <string name="locdvd_refresh">REFRESH</string>
 
 
 </resources>

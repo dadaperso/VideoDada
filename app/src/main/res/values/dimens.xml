@@ -11,4 +11,10 @@
     <dimen name="locdvd_file_detail_margin_left">10dp</dimen>
     <dimen name="locdvd_file_detail_margin_top">15dp</dimen>
     <dimen name="locdvd_zod_detail_margin_top">5dp</dimen>
+
+    <dimen name="slidingmenu_offset">60dp</dimen>
+    <dimen name="list_padding">10dp</dimen>
+    <dimen name="shadow_width">15dp</dimen>
+
+    <integer name="num_cols">1</integer>
 </resources>

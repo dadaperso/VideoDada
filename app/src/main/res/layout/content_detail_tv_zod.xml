@@ -1,113 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.dada.videstation.DetailTvZodActivity">
-
-    <RelativeLayout
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:context="com.dada.videstation.DetailTvZodActivity"
+        >
 
-        <TextView
-            android:id="@+id/txtTvZodTitle"
+        <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Title" />
+            android:layout_height="match_parent" >
 
-        <ImageView
-            android:id="@+id/imgTvZodImage"
-            android:layout_width="130dp"
-            android:layout_height="100dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@id/txtTvZodTitle"
-            android:scaleType="centerCrop"
-            android:src="@drawable/poster" />
+            <TextView
+                android:id="@+id/txtTvZodTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Title" />
 
-        <TextView
-            android:id="@+id/txtTvZodSeason"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/imgTvZodImage"
-            android:layout_toEndOf="@id/imgTvZodImage"
-            android:layout_marginTop="20dp"
-            android:text="Season" />
+            <ImageView
+                android:id="@+id/imgTvZodImage"
+                android:layout_width="130dp"
+                android:layout_height="100dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/txtTvZodTitle"
+                android:scaleType="centerCrop"
+                android:src="@drawable/poster" />
 
-        <TextView
-            android:id="@+id/txtTvZodEpisode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/txtTvZodSeason"
-            android:layout_toRightOf="@id/imgTvZodImage"
-            android:layout_toEndOf="@id/imgTvZodImage"
-            android:layout_marginTop="@dimen/locdvd_zod_detail_margin_top"
-            android:text="Zod" />
+            <TextView
+                android:id="@+id/txtTvZodSeason"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/imgTvZodImage"
+                android:layout_toEndOf="@id/imgTvZodImage"
+                android:layout_marginTop="20dp"
+                android:text="Season" />
 
-        <TextView
-            android:id="@+id/txtTvZodReleaseDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/txtTvZodEpisode"
-            android:layout_toRightOf="@id/imgTvZodImage"
-            android:layout_toEndOf="@id/imgTvZodImage"
-            android:layout_marginTop="@dimen/locdvd_zod_detail_margin_top"
-            android:text="Date" />
+            <TextView
+                android:id="@+id/txtTvZodEpisode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtTvZodSeason"
+                android:layout_toRightOf="@id/imgTvZodImage"
+                android:layout_toEndOf="@id/imgTvZodImage"
+                android:layout_marginTop="@dimen/locdvd_zod_detail_margin_top"
+                android:text="Zod" />
 
-        <TextView
-            android:id="@+id/txtTvZodDuration"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/txtTvZodReleaseDate"
-            android:layout_toRightOf="@id/imgTvZodImage"
-            android:layout_toEndOf="@id/imgTvZodImage"
-            android:layout_marginTop="@dimen/locdvd_zod_detail_margin_top"
-            android:text="Duration" />
+            <TextView
+                android:id="@+id/txtTvZodReleaseDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtTvZodEpisode"
+                android:layout_toRightOf="@id/imgTvZodImage"
+                android:layout_toEndOf="@id/imgTvZodImage"
+                android:layout_marginTop="@dimen/locdvd_zod_detail_margin_top"
+                android:text="Date" />
 
-        <TextView
-            android:id="@+id/txtTvZodRating"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/txtTvZodDuration"
-            android:layout_toRightOf="@id/imgTvZodImage"
-            android:layout_toEndOf="@id/imgTvZodImage"
-            android:layout_marginTop="@dimen/locdvd_zod_detail_margin_top"
-            android:text="Ratting" />
+            <TextView
+                android:id="@+id/txtTvZodDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtTvZodReleaseDate"
+                android:layout_toRightOf="@id/imgTvZodImage"
+                android:layout_toEndOf="@id/imgTvZodImage"
+                android:layout_marginTop="@dimen/locdvd_zod_detail_margin_top"
+                android:text="Duration" />
 
-        <LinearLayout
-            android:id="@+id/tvZodActors"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@id/imgTvZodImage"
-            android:layout_marginTop="5dp"
-            android:orientation="vertical" >
+            <TextView
+                android:id="@+id/txtTvZodRating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtTvZodDuration"
+                android:layout_toRightOf="@id/imgTvZodImage"
+                android:layout_toEndOf="@id/imgTvZodImage"
+                android:layout_marginTop="@dimen/locdvd_zod_detail_margin_top"
+                android:text="Ratting" />
+
+            <LinearLayout
+                android:id="@+id/llTvZodGenre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtTvZodRating"
+                android:layout_toRightOf="@id/imgTvZodImage"
+                android:layout_toEndOf="@id/imgTvZodImage"
+                android:layout_marginTop="@dimen/locdvd_zod_detail_margin_top"
+                android:orientation="vertical">
+
+
+                <LinearLayout
+                    android:id="@+id/llTvZodGenre1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/lblTvZodGenre"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:text="Genre : " />
+                </LinearLayout>
+            </LinearLayout>
+
+
+
+            <LinearLayout
+                android:id="@+id/tvZodActors"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/llTvZodGenre"
+                android:layout_marginTop="5dp"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/locdvd_actor"/>
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/locdvd_actor"/>
-        </LinearLayout>
+                android:id="@+id/txtTvZodSummary"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/tvZodActors"
+                android:layout_marginTop="5dp"
+                android:text="Sumary"
+                />
+        </RelativeLayout>
+    </ScrollView>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/txtTvZodSummary"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@id/tvZodActors"
-            android:layout_marginTop="5dp"
-            android:text="Sumary"
-            />
-
-
-    </RelativeLayout>
-
-
-
-</ScrollView>

@@ -51,7 +51,6 @@ public class TvShowAdapter extends ArrayAdapter<Tvshow> {
 
         Tvshow tvshow = (Tvshow) getItem(position);
 
-
         holder.txtTitle.setText(tvshow.getTitle());
 
         holder.txtReleaseDate.setText(StringConversion.dateToString(tvshow.getReleaseDate()));

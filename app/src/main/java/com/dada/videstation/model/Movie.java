@@ -7,7 +7,8 @@ import java.util.Date;
 /**
  * Created by dada on 26/10/2015.
  */
-public class Movie extends VideoFile implements Serializable {
+public class Movie implements Serializable, Item
+{
 
     private int id;
     private Mapper mapper;
@@ -18,6 +19,7 @@ public class Movie extends VideoFile implements Serializable {
     private Date createDate;
     private Date modifyDate;
     private String rating;
+    private String type;
 
     public int getId() {
         return id;
@@ -27,14 +29,25 @@ public class Movie extends VideoFile implements Serializable {
         this.id = id;
     }
 
-    @Override
+
     public Mapper getMapper() {
         return mapper;
     }
 
-    @Override
+
     public void setMapper(Mapper mapper) {
         this.mapper = mapper;
+        this.setType(mapper.getType());
+    }
+
+    @Override
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    @Override
+    public String getType() {
+        return type;
     }
 
     public String getTitle() {
@@ -61,30 +74,30 @@ public class Movie extends VideoFile implements Serializable {
         this.year = year;
     }
 
-    public Date getOriginallyAvailable() {
+    public Date getReleaseDate() {
         return originallyAvailable;
     }
 
-    public void setOriginallyAvailable(Date originallyAvailable) {
+    public void setReleaseDate(Date originallyAvailable) {
         this.originallyAvailable = originallyAvailable;
     }
 
-    @Override
+
     public Date getCreateDate() {
         return createDate;
     }
 
-    @Override
+
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
 
-    @Override
+
     public Date getModifyDate() {
         return modifyDate;
     }
 
-    @Override
+
     public void setModifyDate(Date modifyDate) {
         this.modifyDate = modifyDate;
     }

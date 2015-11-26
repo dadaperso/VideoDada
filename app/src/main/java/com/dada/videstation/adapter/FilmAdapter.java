@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.dada.videstation.DetailMovieActivity;
+import com.dada.videstation.DetailMovieActivity2;
 import com.dada.videstation.model.Movie;
 import com.dada.videstation.model.ViewHolder;
 import com.dada.videstation.utils.DatabaseMedia;
@@ -18,7 +18,6 @@ import com.dada.videstation.utils.StringConversion;
 import com.example.dada.res1.R;
 
 import java.util.ArrayList;
-
 
 /**
  * Created by damien.lejart on 13/05/2015.
@@ -75,7 +74,7 @@ public class FilmAdapter extends BaseAdapter {
 
         holder.txtTitle.setText(film.getTitle());
 
-        holder.txtReleaseDate.setText(StringConversion.dateToString(film.getOriginallyAvailable()));
+        holder.txtReleaseDate.setText(StringConversion.dateToString(film.getReleaseDate()));
 
         //holder.imgAffiche.setImageResource(film.getiImg());
 
@@ -87,7 +86,8 @@ public class FilmAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
-                Intent intent = new Intent(mContext, DetailMovieActivity.class);
+//                Intent intent = new Intent(mContext, DetailMovieActivity.class);
+                Intent intent = new Intent(mContext, DetailMovieActivity2.class);
                 intent.putExtra("movie",getItem(result.getId()));
 
                 mContext.startActivity(intent);

@@ -1,6 +1,8 @@
 package com.dada.videstation;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -14,6 +16,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
+import android.widget.GridLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.dada.videstation.adapter.TvShowZodAdapter;
@@ -62,12 +67,56 @@ public class DetailTvShowActivity extends AppCompatActivity
 
         setTitle(tvshow.getTitle());
 
+
+        Point size = new Point();
+        getWindowManager().getDefaultDisplay().getSize(size);
+        int screenWidth = size.x - (2*16);
+        int screenHeight = size.y - (2*16);
+        int tiersScreenWidth = (int)(screenWidth * 0.33);
+        int quarterScreenHeigth = (int)(screenHeight * 0.25);
+
+        GridLayout.Spec row1 = GridLayout.spec(0);
+        GridLayout.Spec row2 = GridLayout.spec(1);
+        GridLayout.Spec row3 = GridLayout.spec(2,2);
+
+
+        GridLayout.Spec col0 = GridLayout.spec(0);
+        GridLayout.Spec col1 = GridLayout.spec(1);
+        GridLayout.Spec colspan2 = GridLayout.spec(0, 2);
+
+        GridLayout gridLayout = (GridLayout) findViewById(R.id.glTvShow);
+
+        ImageView twoByTwo1 = (ImageView) findViewById(R.id.imgAfficheFiche);
+        GridLayout.LayoutParams first = new GridLayout.LayoutParams(row1, col0);
+        first.width = tiersScreenWidth;
+        first.height = quarterScreenHeigth;
+        twoByTwo1.setLayoutParams(first);
+        twoByTwo1.setBackgroundColor(Color.BLUE);
+
+
+
         TextView txtReleaseDate = (TextView) findViewById(R.id.txtDateSortieFiche);
+        GridLayout.LayoutParams two = new GridLayout.LayoutParams(row1, col1);
+        two.width = tiersScreenWidth*2;
+        two.height = quarterScreenHeigth;
+        txtReleaseDate.setLayoutParams(two);
+        txtReleaseDate.setBackgroundColor(Color.CYAN);
+        gridLayout.getChildAt(1).setLayoutParams(two);
+
+
         String releaseDate = StringConversion.dateToString(tvshow.getReleaseDate());
         txtReleaseDate.setText(String.format(getResources().getString(
-                R.string.locdvd_movie_releasedate),releaseDate));
+                R.string.locdvd_movie_releasedate), releaseDate));
 
         // TODO getSummary
+        LinearLayout llSummary = (LinearLayout) findViewById(R.id.lltvShowSummary);
+        GridLayout.LayoutParams three = new GridLayout.LayoutParams(row2,colspan2);
+        three.width = screenWidth;
+        three.height = quarterScreenHeigth;
+        llSummary.setLayoutParams(three);
+        llSummary.setBackgroundColor(Color.GREEN);
+        gridLayout.getChildAt(2).setLayoutParams(three);
+
         DatabaseMedia dbMedia = DatabaseMedia.getInstance(this);
         TextView txtSummary = (TextView) findViewById(R.id.txtResumerFiche);
         txtSummary.setText(dbMedia.getSummaryByMapper(tvshow.getMapper()).getSummary());
@@ -79,7 +128,13 @@ public class DetailTvShowActivity extends AppCompatActivity
         final TvShowZodAdapter adapter = new TvShowZodAdapter(this,dataListSeason,dataListZod);
 
 
+        GridLayout.LayoutParams four = new GridLayout.LayoutParams(row3,colspan2);
+        four.width = screenWidth;
+        four.height = quarterScreenHeigth*2;
         ExpandableListView listTvZod = (ExpandableListView) findViewById(R.id.lstTvShowZod);
+        listTvZod.setLayoutParams(four);
+        gridLayout.getChildAt(3).setLayoutParams(four);
+        listTvZod.setBackgroundColor(Color.RED);
         listTvZod.setAdapter(adapter);
 
         listTvZod.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
@@ -92,6 +147,8 @@ public class DetailTvShowActivity extends AppCompatActivity
                 return true;
             }
         });
+        listTvZod.expandGroup(0);
+
     }
 
     @Override

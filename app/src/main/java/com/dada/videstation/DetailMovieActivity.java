@@ -83,7 +83,7 @@ public class DetailMovieActivity extends AppCompatActivity
                 R.string.locdvd_movie_real), ""));
 
         TextView txtReleaseDate = (TextView) findViewById(R.id.txtDateSortieFiche);
-        String releaseDate = StringConversion.dateToString(movie.getOriginallyAvailable());
+        String releaseDate = StringConversion.dateToString(movie.getReleaseDate());
         txtReleaseDate.setText(String.format(getResources().getString(
                 R.string.locdvd_movie_releasedate),releaseDate));
 

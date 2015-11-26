@@ -57,6 +57,10 @@ public class API
     public static final String TAG_CHANNEL = "channel";
     public static final String TAG_RATING = "certificate";
     public static final String TAG_GENRE = "gnere" ;
+    public static final String TAG_POSITION = "position";
+    public static final String TAG_UID = "uid";
+    public static final String TAG_VIDEO_FILE_ID = "id";
+    public static final String TAG_WATCH = "watch_status";
 
 
     //TODO create table for listing all field of tables DB
@@ -101,7 +105,9 @@ public class API
         String[] channel = {TAG_CHANNEL, "int"};
         String[] rating = {TAG_RATING, "string"};
         String[] genre = {TAG_GENRE, "string"};
-
+        String[] uid = {TAG_UID, "int"};
+        String[] videoFile = {TAG_VIDEO_FILE, "object"};
+        String[] position = {TAG_POSITION, "int"};
 
 
 
@@ -135,6 +141,9 @@ public class API
         fieldsTables.put(TAG_GENRE, genreFields);
 
 
+        String[][] watchFields = {id,uid , videoFile, mapper, position, createDate, modifyDate};
+        fieldsTables.put(TAG_WATCH, watchFields);
+
     }
 
     public void updateMovie(){
@@ -166,6 +175,10 @@ public class API
         new GetData(TAG_GENRE).execute();
     }
 
+    public void updateWatch() {
+        new GetData(TAG_WATCH).execute();
+    }
+
     /**
      * Async task class to get json by making HTTP call
      * */
@@ -194,7 +207,13 @@ public class API
             // Creating service handler class instance
             ServiceHandler sh = new ServiceHandler(context);
 
-            String table = dbMedia.getTagToTable(this.type);
+            String table = null;
+            try {
+                table = dbMedia.getTagToTable(this.type);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
 
             String lastUpdate = dbMedia.getLastUpdateDateOrId(table);
 
@@ -296,24 +315,28 @@ public class API
              * Updating parsed JSON data into ListView
              * */
 
-            String table = dbMedia.getTagToTable(this.type);
+            String table = null;
+            try {
+                table = dbMedia.getTagToTable(this.type);
 
-            int nbRows = dbMedia.getCountAllByTable(table);
+                int nbRows = dbMedia.getCountAllByTable(table);
 
-            if(result != null && result != nbRows){
-                ArrayList<Integer> ids = dbMedia.getAllIdByTable(table);
+                if(result != null && result != nbRows){
+                    ArrayList<Integer> ids = dbMedia.getAllIdByTable(table);
 
-                data = new JSONArray(ids);
+                    data = new JSONArray(ids);
 
-                ContentValues params = new ContentValues();
-                params.put("ids", data.toString());
+                    ContentValues params = new ContentValues();
+                    params.put("ids", data.toString());
 
-                new PutData(this.type,params).execute();
+                    new PutData(this.type,params).execute();
+
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
 
             }
-
         }
-
     }
 
     private class PutData extends AsyncTask<Void, Void, Integer> {
@@ -346,7 +369,13 @@ public class API
             // Creating service handler class instance
             ServiceHandler sh = new ServiceHandler(context);
 
-            String table = dbMedia.getTagToTable(this.type);
+            String table = null;
+            try {
+                table = dbMedia.getTagToTable(this.type);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
 
             // Making a request to url and getting response
             String urlQuery = "/update/maj.json?entities[]="+this.type;

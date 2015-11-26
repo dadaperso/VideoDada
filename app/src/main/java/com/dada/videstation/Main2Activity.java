@@ -72,6 +72,9 @@ public class Main2Activity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }else if (id == R.id.action_search){
+            Intent intent = new Intent(Main2Activity.this, SearchActivity.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);

@@ -6,12 +6,13 @@ import java.util.Date;
 /**
  * Created by dada on 26/10/2015.
  */
-public class Tvshow implements Serializable
+public class Tvshow implements Serializable, Item
 {
     private int id, year;
     String title, sortTitle;
     Date releaseDate, createDate, modifyDate;
     Mapper mapper;
+    private String type;
 
     public int getId() {
         return id;
@@ -75,5 +76,16 @@ public class Tvshow implements Serializable
 
     public void setMapper(Mapper mapper) {
         this.mapper = mapper;
+        this.setType(mapper.getType());
+    }
+
+    @Override
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    @Override
+    public String getType() {
+        return type;
     }
 }

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.dada.videstation.DetailMovieActivity"
+    android:id="@+id/glMovie">
+
+    <!-- Groupe Titre-->
+
+
+    <TextView
+        android:id="@+id/txtTitreFiche"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="Test"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+
+
+    <ImageView
+        android:id="@+id/imgAfficheFiche"
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
+        android:src="@drawable/poster"
+        android:maxWidth="130dp"
+        android:scaleType="fitStart" />
+
+        <TextView
+            android:id="@+id/txtRealFiche"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/txtDateSortieFiche"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/txtClassifictionFiche"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1" />
+
+        <!-- Layout Genre -->
+        <LinearLayout
+            android:id="@+id/llGenre"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="1" >
+            <LinearLayout
+                android:id="@+id/llGenre1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/txtGenreFiche"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                     />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/txtDureeFiche"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1" />
+
+            <!-- Groupe Résumer-->
+
+        <TextView
+            android:id="@+id/lblSynopsis"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:text="@string/locdvd_resumer" />
+
+        <TextView
+            android:id="@+id/txtResumerFiche"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
+
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/actorGroup">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/locdvd_actor"
+                android:textColor="#FF00CC"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:id="@+id/txtActorLabel"/>
+
+        </LinearLayout>
+
+
+</GridLayout>
+
