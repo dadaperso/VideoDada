@@ -6,6 +6,7 @@ package com.dada.videstation.utils;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,7 +23,7 @@ public class ServiceHandler {
     public final static int POST = 2;
     private static final String USER_AGENT = "Mozilla/5.0";
 
-    public static final String API_URL = "http://pc-dada.home/api-locdvd/app_dev.php";
+    public static final String API_URL = "http://pc-dada.home/api-locdvd";
     private Context context;
 
     public ServiceHandler(Context ctx) {
@@ -51,8 +52,9 @@ public class ServiceHandler {
         try {
 
             URL obj = new URL(API_URL + request);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            Log.d("ServiceHandler", "URL : " + obj.toString());
             con.setRequestProperty("User-Agent", USER_AGENT);
 
             if (method == ServiceHandler.POST) {

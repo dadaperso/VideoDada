@@ -1,3 +1,4 @@
+
 package com.dada.videstation.utils;
 
 import android.content.ContentValues;
@@ -7,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.widget.CheckBox;
+import android.widget.Toast;
 
 import com.dada.videstation.model.Actor;
 import com.dada.videstation.model.Genre;
@@ -21,16 +24,13 @@ import com.dada.videstation.model.VideoFile;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 
 /**
  * Created by damien.lejart on 13/05/2015.
  */
+
 public class DatabaseMedia extends SQLiteOpenHelper {
 
 
@@ -48,7 +48,9 @@ public class DatabaseMedia extends SQLiteOpenHelper {
     private static final String TABLE_MAPPER = "t_mapper" ;
     private static final String TABLE_GENRE = "t_genre";
     private static final String TABLE_WATCH = "t_watch_status";
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 7;
+
+    private boolean where = false;
 
 
     public static DatabaseMedia getInstance(Context ctx) {
@@ -131,7 +133,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int currentVersion, int newVersion) {
 
         if (newVersion == 2){
-            ArrayList<String> strReq = new ArrayList();
+            ArrayList<String> strReq = new ArrayList<>();
 
             // Add tvshow table
             strReq.add("CREATE TABLE "+TABLE_TV_SHOW+" ("+ API.TAG_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -166,6 +168,9 @@ public class DatabaseMedia extends SQLiteOpenHelper {
             db.execSQL("CREATE TABLE "+TABLE_WATCH+" ("+API.TAG_ID+ " INTEGER PRIMARY KEY AUTOINCREMENT,"+
                     API.TAG_UID+" INT, "+API.TAG_VIDEO_FILE_ID+" INT, "+API.TAG_MAPPER_ID+" INT, "+
                     API.TAG_POSITION+" INT, "+API.TAG_CREATE_DATE+" DATETIME, "+ API.TAG_MODIFY_DATE+" DATETIME)");
+        }else if (newVersion == 7){
+            db.execSQL("CREATE INDEX t_movie_mapper_id ON "+TABLE_MOVIE+"("+API.TAG_MAPPER_ID+");");
+            db.execSQL("CREATE INDEX t_video_flie_mapper_id ON "+TABLE_VIDEO_FILE+"("+API.TAG_MAPPER_ID+");");
         }
     }
 
@@ -227,7 +232,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
     /**
      *
      * @param table Name of table to check update
-     * @return
+     * @return String
      */
     public String getLastUpdateDateOrId(String table){
 
@@ -335,8 +340,6 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         String[] args = {"%"+actor.getActor()+"%"};
         Cursor result = db.rawQuery(query, args);
 
-        ArrayList<Movie> lstMovies = new ArrayList<>();
-
         result.moveToFirst();
         while(!result.isAfterLast()) {
             Movie movie = this.hydrateMovie(result);
@@ -385,20 +388,9 @@ public class DatabaseMedia extends SQLiteOpenHelper {
             Actor actor = new Actor();
             actor.setId(result.getInt(0));
             actor.setMapper(mapper);
-            actor.setActor(result.getString(1));;
-
-            DateFormat date = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ");
-            try {
-                actor.setCreateDate(date.parse(result.getString(2) ));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                actor.setModifyDate(date.parse(result.getString(3) ));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+            actor.setActor(result.getString(1));
+            actor.setCreateDate(StringConversion.stringToDate(result.getString(2)));
+            actor.setModifyDate(StringConversion.stringToDate(result.getString(3)));
 
             lstActor.add(actor);
             result.moveToNext();
@@ -421,7 +413,6 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         Cursor result = db.query(TABLE_SUMMARY, columns, where, whereArgs, null, null, null);
 
         Summary summary = null;
-        DateFormat date = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ");
 
         result.moveToFirst();
         while (!result.isAfterLast()){
@@ -429,20 +420,13 @@ public class DatabaseMedia extends SQLiteOpenHelper {
             summary.setId(result.getInt(0));
             summary.setMapper(mapper);;
             summary.setSummary(result.getString(1));
+            summary.setCreateDate(StringConversion.stringToDate(result.getString(2)));
+            summary.setModifyDate(StringConversion.stringToDate(result.getString(3)));
 
-            try {
-                summary.setCreateDate(date.parse(result.getString(2)));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                summary.setModifyDate(date.parse(result.getString(3)));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
             result.moveToNext();
         }
+
+        result.close();
 
         return summary;
     }
@@ -472,7 +456,6 @@ public class DatabaseMedia extends SQLiteOpenHelper {
 
 
         Tvshow tvshow = null;
-        DateFormat date = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ");
         result.moveToFirst();
         int currentTvShow = 0;
         while (!result.isAfterLast()){
@@ -497,7 +480,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
                     result2.moveToNext();
                 }
 
-
+                result2.close();
 
                 listTvShow.add(tvshow);
 
@@ -508,7 +491,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
                 }
             }
 
-            TvZod tvZod = hydrateTvZod(result,date);
+            TvZod tvZod = hydrateTvZod(result);
 
             tvZod.setTvshow(tvshow);
 
@@ -516,6 +499,8 @@ public class DatabaseMedia extends SQLiteOpenHelper {
 
             result.moveToNext();
         }
+
+        result.close();
 
         if (tvshow != null)
             listZod.put(tvshow.getTitle(), lstZod);
@@ -538,7 +523,6 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         String order = API.TAG_SEASON+" ASC, "+API.TAG_EPISODE+" ASC";
         Cursor result = db.query(TABLE_TV_ZOD, columns, where, whereArgs, null, null, order);
 
-        DateFormat date = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ");
         int currentSeason = 0;
         ArrayList<TvZod> lstZod = null;
 
@@ -561,7 +545,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
 
             }
 
-            TvZod tvZod = hydrateTvZod(result,date);
+            TvZod tvZod = hydrateTvZod(result);
             tvZod.setTvshow(tvshow);
 
             lstZod.add(tvZod);
@@ -579,7 +563,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         return response;
     }
 
-    private TvZod hydrateTvZod(Cursor result, DateFormat date){
+    private TvZod hydrateTvZod(Cursor result){
         TvZod tvZod = new TvZod();
         tvZod.setId(result.getInt(0));
 
@@ -592,31 +576,13 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         if (titre == null){
             titre = "Episode "+result.getInt(5);
         }
-        tvZod.setTagLine(result.getString(3));
+        tvZod.setTagLine(titre);
         tvZod.setSaison(result.getInt(4));
         tvZod.setEpisode(result.getInt(5));
         tvZod.setYear(result.getInt(6));
-
-        try {
-            tvZod.setReleaseDate(date.parse(result.getString(7)));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (NullPointerException e){
-            e.printStackTrace();
-        }
-
-        try {
-            tvZod.setCreateDate(date.parse(result.getString(8)));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            tvZod.setModifyDate(date.parse(result.getString(9)));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
+        tvZod.setReleaseDate(StringConversion.stringToDate(result.getString(7)));
+        tvZod.setCreateDate(StringConversion.stringToDate(result.getString(8)));
+        tvZod.setModifyDate(StringConversion.stringToDate(result.getString(9)));
         tvZod.setRating(result.getString(10));
 
         return tvZod;
@@ -632,7 +598,6 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         Cursor result = db.query(TABLE_TV_SHOW,columns,null,null,null,null,API.TAG_MODIFY_DATE+ " DESC");
 
         result.moveToFirst();
-        DateFormat date = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ");
 
         while (!result.isAfterLast()){
 
@@ -678,32 +643,37 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         Cursor result = db.rawQuery(sql, null);
         result.moveToFirst();
 
-        String currentActor = result.getString(0);
-        Actor actor = new Actor();
-        actor.setActor(currentActor);
+        if(result.getCount() >0 )
+        {
+            String currentActor = result.getString(0);
+            Actor actor = new Actor();
+            actor.setActor(currentActor);
 
-        while (!result.isAfterLast()){
-            String actorName = result.getString(0);
-            String type = result.getString(1);
-            int nbType = result.getInt(2);
+            while (!result.isAfterLast()){
+                String actorName = result.getString(0);
+                String type = result.getString(1);
+                int nbType = result.getInt(2);
 
-            if (!currentActor.equals(actorName)){
-                lstActor.add(actor);
-                actor = new Actor();
-                // add name into Object
-                actor.setActor(result.getString(0));
-                currentActor = actorName;
+                if (!currentActor.equals(actorName)){
+                    lstActor.add(actor);
+                    actor = new Actor();
+                    // add name into Object
+                    actor.setActor(result.getString(0));
+                    currentActor = actorName;
+                }
+
+                // add nb aparence by media type
+                if (type.equals(API.TAG_MOVIE)){
+                    actor.setNbMovie(nbType);
+                }else if (type.equals("tvshow_episode")){
+                    actor.setNbZod(nbType);
+                }
+
+                result.moveToNext();
             }
-
-            // add nb aparence by media type
-            if (type.equals(API.TAG_MOVIE)){
-                actor.setNbMovie(nbType);
-            }else if (type.equals("tvshow_episode")){
-                actor.setNbZod(nbType);
-            }
-
-            result.moveToNext();
         }
+
+        result.close();
 
         return lstActor;
     }
@@ -863,6 +833,8 @@ public class DatabaseMedia extends SQLiteOpenHelper {
             result.moveToNext();
         }
 
+        result.close();
+
         return mapper_id;
     }
 
@@ -904,50 +876,11 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         return genre;
     }
 
-
-    public ArrayList<Item> getItemNotWatched(String type){
-        ArrayList<Item> lstItem = new ArrayList<>();
-
-        SQLiteDatabase db = this.getReadableDatabase();
-
-
-        String table;
-        try {
-            table = this.getTagToTable(type);
-
-            // TODO if type equals tvshow oder on tvZod table
-            String sql = "SELECT * FROM "+table+
-                    " WHERE "+table+"."+API.TAG_MAPPER_ID+" NOT IN ("+this.queryNotViewed()+")"+
-                    " ORDER BY "+table+"."+API.TAG_MODIFY_DATE+" DESC";
-
-            Log.d("ItemNotWatch", "SQL: "+sql);
-
-            String[] whereArgs = {type};
-            Cursor result = db.rawQuery(sql, whereArgs);
-
-            result.moveToFirst();
-            while (!result.isAfterLast()){
-
-                Item item;
-                if (type.equals(TABLE_MOVIE)){
-                    item = this.hydrateMovie(result);
-                }else {
-                    item = this.hydrateTvShow(result);
-                }
-
-                lstItem.add(item);
-
-                result.moveToNext();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return lstItem;
-    }
-
-
-    private String queryNotViewed()
+    /**
+     * require itemType parameter
+     * @return
+     */
+    private String queryViewed()
     {
         String query = "SELECT "+TABLE_WATCH+"."+API.TAG_MAPPER_ID+" FROM "+TABLE_WATCH;
 
@@ -964,5 +897,112 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         return query;
     }
 
+    private String queryAudio(CheckBox channel5_1, CheckBox codec_DTS)
+    {
+        String strAudio="";
+        if (this.where){
+            strAudio += " AND ";
+        }else {
+            strAudio += " WHERE";
+        }
 
+        if (codec_DTS.isChecked()){
+            strAudio += " v."+API.TAG_AUDIO_CODEC+"='dts'";
+        }
+
+        if (channel5_1.isChecked()){
+            strAudio += " v."+API.TAG_CHANNEL+" >= 5";
+        }
+
+        return  strAudio;
+    }
+
+    private String buildSearchQuery(String typeItem, CheckBox cbSearchNotWatch, CheckBox cbSearchWatch,
+                                  CheckBox cbSearchResHD1080, CheckBox cbSearchResHD720,
+                                  CheckBox cbSearchResSD, CheckBox cbSearchAudio5_1,
+                                  CheckBox cbSearchAudioDTS)
+    {
+        String query = null;
+
+        try {
+            String table  = this.getTagToTable(typeItem);
+
+            query = "SELECT i.* FROM "+TABLE_VIDEO_FILE+" as v";
+
+            //add type into query
+            query += " INNER JOIN "+table+" as i ON i."+API.TAG_MAPPER_ID+" = v."+API.TAG_MAPPER_ID;
+
+            String strWhere="";
+
+            // add resolution into query
+            if (cbSearchNotWatch.isChecked()){
+                if (this.where){
+                    strWhere += " AND ";
+                }else {
+                    strWhere = " WHERE ";
+                    this.where = true;
+                }
+                strWhere += "i."+API.TAG_MAPPER_ID+ " NOT IN ("+this.queryViewed() +")";
+            }else if (cbSearchWatch.isChecked())
+            {
+                if (this.where){
+                    strWhere += " AND ";
+                }else {
+                    strWhere = " WHERE ";
+                }
+                strWhere = "i."+API.TAG_MAPPER_ID+ "IN ("+this.queryViewed() +")";
+            }
+            query += strWhere;
+
+            query += this.queryAudio(cbSearchAudio5_1, cbSearchAudioDTS);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+
+        return query;
+    }
+
+    public ArrayList<Item> searchedItems(CheckBox itemMovie, CheckBox itemTv, CheckBox cbSearchNotWatch,
+                              CheckBox cbSearchWatch, CheckBox cbSearchResHD1080,
+                              CheckBox cbSearchResHD720, CheckBox cbSearchResSD,
+                              CheckBox cbSearchAudio5_1, CheckBox cbSearchAudioDTS) {
+
+        String query = this.buildSearchQuery(API.TAG_MOVIE, cbSearchNotWatch, cbSearchWatch,
+                cbSearchResHD1080, cbSearchResHD720, cbSearchResSD, cbSearchAudio5_1,
+                cbSearchAudioDTS);
+
+        ArrayList<Item> lstItem = new ArrayList<>();
+
+        try {
+            SQLiteDatabase db = this.getReadableDatabase();
+        String[] whereArgs = {API.TAG_MOVIE};
+            Cursor result = db.rawQuery(query,whereArgs);
+            result.moveToFirst();
+
+
+            while (!result.isAfterLast())
+            {
+                Item item;
+                if(itemMovie.isChecked()){
+                    item = this.hydrateMovie(result);
+                }else {
+                    item = this.hydrateTvShow(result);
+                }
+
+                lstItem.add(item);
+
+                result.moveToNext();
+            }
+        }catch (SQLiteException e){
+            e.printStackTrace();
+            Toast.makeText(context, "Erreur SQL !",Toast.LENGTH_LONG).show();
+        }finally {
+            this.where = false;
+        }
+
+        return lstItem;
+    }
 }

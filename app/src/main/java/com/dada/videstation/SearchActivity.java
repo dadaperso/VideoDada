@@ -18,7 +18,6 @@ import android.widget.CheckBox;
 import android.widget.GridView;
 
 import com.dada.videstation.model.Item;
-import com.dada.videstation.utils.API;
 import com.dada.videstation.utils.DatabaseMedia;
 import com.example.dada.res1.R;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -145,14 +144,30 @@ public class SearchActivity extends AppCompatActivity
         String type;
 
         // TODO fix pb detection check type
-        if (((CheckBox)findViewById(R.id.cbSearchTypeTv)).isChecked()){
-            type = API.TAG_MOVIE;
-        }else {
-            type = API.TAG_TV_SHOW;
-        }
+        CheckBox cbSearchTypeTv = (CheckBox)findViewById(R.id.cbSearchTypeTv);
+        CheckBox cbSearchTypeMovie = (CheckBox)findViewById(R.id.cbSearchTypeMovie);
 
-        if (!type.equals("")){
-            ArrayList<Item> newItems = DatabaseMedia.getInstance(this).getItemNotWatched(type);
+
+        ArrayList<Item> newItems;
+        if (cbSearchTypeMovie.isChecked()|| cbSearchTypeTv.isChecked()){
+
+            CheckBox cbSearchNotWatch = (CheckBox)findViewById(R.id.cbSearchNotWatch);
+            CheckBox cbSearchWatch = (CheckBox)findViewById(R.id.cbSearchWatch);
+
+            // HD or Not
+            CheckBox cbSearchResHD1080 = (CheckBox) findViewById(R.id.cbSearchResHD1080);
+            CheckBox cbSearchResHD720 = (CheckBox) findViewById(R.id.cbSearchResHD720);
+            CheckBox cbSearchResSD = (CheckBox) findViewById(R.id.cbSearchResSD);
+
+            // Audoi codec + channel
+            CheckBox cbSearchAudio5_1 = (CheckBox) findViewById(R.id.cbSearchAudio5_1);
+            CheckBox cbSearchAudioDTS = (CheckBox) findViewById(R.id.cbSearchAudioDTS);
+
+
+            newItems = DatabaseMedia.getInstance(this).searchedItems(cbSearchTypeMovie, cbSearchTypeTv,
+                    cbSearchNotWatch, cbSearchWatch, cbSearchResHD1080, cbSearchResHD720,
+                    cbSearchResSD, cbSearchAudio5_1, cbSearchAudioDTS);
+
             adapter.clear();
             adapter.addAll(newItems);
             adapter.notifyDataSetChanged();

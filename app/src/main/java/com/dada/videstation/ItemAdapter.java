@@ -52,7 +52,7 @@ public class ItemAdapter  extends ArrayAdapter{
         }
 
         Item item;
-        if (getItem(position).getClass().toString().equals("Movie")){
+        if (getItem(position).getClass().toString().equals("Movie")){ //TODO fix issue recup class name
             item = (Movie) getItem(position);
         }else{
             item = (Tvshow) getItem(position);

@@ -59,7 +59,7 @@ public class API
     public static final String TAG_GENRE = "gnere" ;
     public static final String TAG_POSITION = "position";
     public static final String TAG_UID = "uid";
-    public static final String TAG_VIDEO_FILE_ID = "id";
+    public static final String TAG_VIDEO_FILE_ID = "video_file_id";
     public static final String TAG_WATCH = "watch_status";
 
 
