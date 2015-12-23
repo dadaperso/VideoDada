@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.GridView;
 
 import com.dada.videstation.model.Item;
@@ -151,6 +152,10 @@ public class SearchActivity extends AppCompatActivity
         ArrayList<Item> newItems;
         if (cbSearchTypeMovie.isChecked()|| cbSearchTypeTv.isChecked()){
 
+            //Keyword
+            EditText editTextKeyword = (EditText) findViewById(R.id.txtSearchKeyword);
+
+            // Watch Or Not Or Both
             CheckBox cbSearchNotWatch = (CheckBox)findViewById(R.id.cbSearchNotWatch);
             CheckBox cbSearchWatch = (CheckBox)findViewById(R.id.cbSearchWatch);
 
@@ -166,7 +171,7 @@ public class SearchActivity extends AppCompatActivity
 
             newItems = DatabaseMedia.getInstance(this).searchedItems(cbSearchTypeMovie, cbSearchTypeTv,
                     cbSearchNotWatch, cbSearchWatch, cbSearchResHD1080, cbSearchResHD720,
-                    cbSearchResSD, cbSearchAudio5_1, cbSearchAudioDTS);
+                    cbSearchResSD, cbSearchAudio5_1, cbSearchAudioDTS, editTextKeyword);
 
             adapter.clear();
             adapter.addAll(newItems);

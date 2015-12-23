@@ -4,11 +4,14 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/txtActorTvShowTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
         android:layout_marginLeft="30dp"
-        android:id="@+id/txtActorTvShowTitle"/>
+        android:text="SerieName"
+        android:textSize="20dp"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
         android:layout_width="wrap_content"

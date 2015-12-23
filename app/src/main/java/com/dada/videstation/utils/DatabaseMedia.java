@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.dada.videstation.model.Actor;
@@ -345,9 +346,11 @@ public class DatabaseMedia extends SQLiteOpenHelper {
             Movie movie = this.hydrateMovie(result);
 
             lstMovie.add(movie);
+
+            result.moveToNext();
         }
 
-
+        result.close();
 
         return lstMovie;
     }
@@ -917,15 +920,36 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         return  strAudio;
     }
 
-    private String buildSearchQuery(String typeItem, CheckBox cbSearchNotWatch, CheckBox cbSearchWatch,
-                                  CheckBox cbSearchResHD1080, CheckBox cbSearchResHD720,
-                                  CheckBox cbSearchResSD, CheckBox cbSearchAudio5_1,
-                                  CheckBox cbSearchAudioDTS)
+    private Object[] buildSearchQuery(String typeItem, CheckBox cbSearchNotWatch, CheckBox cbSearchWatch,
+                                    CheckBox cbSearchResHD1080, CheckBox cbSearchResHD720,
+                                    CheckBox cbSearchResSD, CheckBox cbSearchAudio5_1,
+                                    CheckBox cbSearchAudioDTS, EditText editTextKeyword)
     {
+        Object[] result = new Object[2];
         String query = null;
+        String[] args = null;
 
         try {
             String table  = this.getTagToTable(typeItem);
+
+            if (editTextKeyword.getText().length() > 2)
+            {
+                String keyword = editTextKeyword.getText().toString();
+                table = "("+
+                        " SELECT m1.* FROM "+TABLE_MOVIE+" as m1"+
+                        " WHERE m1."+API.TAG_TITLE+" LIKE '%"+keyword+"%'"+
+                        " UNION "+
+                        " SELECT m2.* FROM "+TABLE_MOVIE+" as m2"+
+                        " INNER JOIN "+TABLE_ACTOR+" as a ON a."+API.TAG_MAPPER_ID+"=m2."+API.TAG_MAPPER_ID+
+                        "   AND a."+API.TAG_ACTOR+" LIKE '%"+keyword+"%'"+
+                        " UNION "+
+                        " SELECT m3.* FROM "+TABLE_MOVIE+" as m3"+
+                        " INNER JOIN "+TABLE_SUMMARY+" as s ON s."+API.TAG_MAPPER_ID+"=m3."+API.TAG_MAPPER_ID+
+                        "  AND s."+API.TAG_SUMMARY+" LIKE '%"+keyword+"%'"+
+                        ")"
+                ;
+            }
+
 
             query = "SELECT i.* FROM "+TABLE_VIDEO_FILE+" as v";
 
@@ -943,6 +967,8 @@ public class DatabaseMedia extends SQLiteOpenHelper {
                     this.where = true;
                 }
                 strWhere += "i."+API.TAG_MAPPER_ID+ " NOT IN ("+this.queryViewed() +")";
+                args = new String[]{typeItem};
+
             }else if (cbSearchWatch.isChecked())
             {
                 if (this.where){
@@ -951,35 +977,46 @@ public class DatabaseMedia extends SQLiteOpenHelper {
                     strWhere = " WHERE ";
                 }
                 strWhere = "i."+API.TAG_MAPPER_ID+ "IN ("+this.queryViewed() +")";
+                args = new String[]{typeItem};
             }
             query += strWhere;
 
-            query += this.queryAudio(cbSearchAudio5_1, cbSearchAudioDTS);
+            // Audio Criteria
+            if (cbSearchAudio5_1.isChecked() || cbSearchAudioDTS.isChecked()) {
+                query += this.queryAudio(cbSearchAudio5_1, cbSearchAudioDTS);
+            }
+
+            // Order Criteria
+            query += " ORDER BY "+API.TAG_CREATE_DATE+" DESC";
+
+            Log.d(null, "query => "+query);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        result[0] = query;
+        result[1] = args;
 
 
-        return query;
+        return result;
     }
 
     public ArrayList<Item> searchedItems(CheckBox itemMovie, CheckBox itemTv, CheckBox cbSearchNotWatch,
-                              CheckBox cbSearchWatch, CheckBox cbSearchResHD1080,
-                              CheckBox cbSearchResHD720, CheckBox cbSearchResSD,
-                              CheckBox cbSearchAudio5_1, CheckBox cbSearchAudioDTS) {
+                                         CheckBox cbSearchWatch, CheckBox cbSearchResHD1080,
+                                         CheckBox cbSearchResHD720, CheckBox cbSearchResSD,
+                                         CheckBox cbSearchAudio5_1, CheckBox cbSearchAudioDTS,
+                                         EditText editTextKeyword) {
 
-        String query = this.buildSearchQuery(API.TAG_MOVIE, cbSearchNotWatch, cbSearchWatch,
+        Object[] resultQuery = this.buildSearchQuery(API.TAG_MOVIE, cbSearchNotWatch, cbSearchWatch,
                 cbSearchResHD1080, cbSearchResHD720, cbSearchResSD, cbSearchAudio5_1,
-                cbSearchAudioDTS);
+                cbSearchAudioDTS, editTextKeyword);
 
         ArrayList<Item> lstItem = new ArrayList<>();
 
         try {
             SQLiteDatabase db = this.getReadableDatabase();
-        String[] whereArgs = {API.TAG_MOVIE};
-            Cursor result = db.rawQuery(query,whereArgs);
+            Cursor result = db.rawQuery((String)resultQuery[0],(String[])resultQuery[1]);
             result.moveToFirst();
 
 
@@ -997,6 +1034,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
                 result.moveToNext();
             }
         }catch (SQLiteException e){
+
             e.printStackTrace();
             Toast.makeText(context, "Erreur SQL !",Toast.LENGTH_LONG).show();
         }finally {
