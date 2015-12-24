@@ -35,7 +35,6 @@ import java.util.HashMap;
 public class DatabaseMedia extends SQLiteOpenHelper {
 
 
-
     private static DatabaseMedia mInstance;
     Context context;
 
@@ -49,7 +48,8 @@ public class DatabaseMedia extends SQLiteOpenHelper {
     private static final String TABLE_MAPPER = "t_mapper" ;
     private static final String TABLE_GENRE = "t_genre";
     private static final String TABLE_WATCH = "t_watch_status";
-    private static final int DATABASE_VERSION = 7;
+    private static final String TABLE_POSTER = "t_poster";
+    private static final int DATABASE_VERSION = 9;
 
     private boolean where = false;
 
@@ -70,6 +70,8 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
         this.context = context;
+
+        Log.d("PATH DB", (context.getDatabasePath(this.getDatabaseName()).getAbsolutePath()));
 
     }
 
@@ -125,6 +127,10 @@ public class DatabaseMedia extends SQLiteOpenHelper {
                 API.TAG_UID+" INT, "+API.TAG_VIDEO_FILE_ID+" INT, "+API.TAG_MAPPER_ID+" INT, "+
                 API.TAG_POSITION+" INT, "+API.TAG_CREATE_DATE+" DATETIME, "+ API.TAG_MODIFY_DATE+" DATETIME)");
 
+        strReq.add("CREATE TABLE "+TABLE_POSTER+" ("+API.TAG_ID+" INTEGER PRIMARY KEY AUTOINCREMENT,"+
+                API.TAG_MAPPER_ID+" INT, "+API.TAG_LO_ID+" int, "+API.TAG_MD5+" TEXT, "+
+                API.TAG_CREATE_DATE+" DATETIME, "+API.TAG_MODIFY_DATE+" DATETIME)");
+
         for(String query: strReq){
             db.execSQL(query);
         }
@@ -172,6 +178,15 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         }else if (newVersion == 7){
             db.execSQL("CREATE INDEX t_movie_mapper_id ON "+TABLE_MOVIE+"("+API.TAG_MAPPER_ID+");");
             db.execSQL("CREATE INDEX t_video_flie_mapper_id ON "+TABLE_VIDEO_FILE+"("+API.TAG_MAPPER_ID+");");
+        }else if (newVersion == 8){
+            db.execSQL("CREATE TABLE "+TABLE_POSTER+" ("+API.TAG_ID+" INTEGER PRIMARY KEY AUTOINCREMENT,"+
+                    API.TAG_MAPPER_ID+" INT, "+API.TAG_LO_ID+" int, "+API.TAG_MD5+" TEXT, "+
+                    API.TAG_CREATE_DATE+" DATETIME, "+API.TAG_MODIFY_DATE+" DATETIME)");
+        }else if (newVersion == 9 ){
+            db.execSQL("DROP TABLE "+TABLE_POSTER);
+            db.execSQL("CREATE TABLE "+TABLE_POSTER+" ("+API.TAG_ID+" INTEGER PRIMARY KEY AUTOINCREMENT,"+
+                    API.TAG_MAPPER_ID+" INT, "+API.TAG_LO_ID+" int, "+API.TAG_MD5+" TEXT, "+
+                    API.TAG_CREATE_DATE+" DATETIME, "+API.TAG_MODIFY_DATE+" DATETIME)");
         }
     }
 
@@ -295,6 +310,9 @@ public class DatabaseMedia extends SQLiteOpenHelper {
                 break;
             case API.TAG_WATCH:
                 table = TABLE_WATCH;
+                break;
+            case API.TAG_POSTER:
+                table = TABLE_POSTER;
                 break;
             default:
                 throw new Exception("Unable to find a table for '"+tag+"' tag");

@@ -61,6 +61,9 @@ public class API
     public static final String TAG_UID = "uid";
     public static final String TAG_VIDEO_FILE_ID = "video_file_id";
     public static final String TAG_WATCH = "watch_status";
+    public static final String TAG_POSTER = "poster";
+    public static final String TAG_LO_ID = "lo_oid";
+    public static final String TAG_MD5 = "md5";
 
 
     //TODO create table for listing all field of tables DB
@@ -108,6 +111,8 @@ public class API
         String[] uid = {TAG_UID, "int"};
         String[] videoFile = {TAG_VIDEO_FILE, "object"};
         String[] position = {TAG_POSITION, "int"};
+        String[] loId = {TAG_LO_ID, "int"};
+        String[] md5 = {TAG_MD5, "string"};
 
 
 
@@ -144,6 +149,9 @@ public class API
         String[][] watchFields = {id,uid , videoFile, mapper, position, createDate, modifyDate};
         fieldsTables.put(TAG_WATCH, watchFields);
 
+        String[][] posterFields = {id, mapper, loId, md5, createDate, modifyDate};
+        fieldsTables.put(TAG_POSTER, posterFields);
+
     }
 
     public void updateMovie(){
@@ -178,6 +186,8 @@ public class API
     public void updateWatch() {
         new GetData(TAG_WATCH).execute();
     }
+
+    public void updatePoster() { new GetData(TAG_POSTER).execute(); }
 
     /**
      * Async task class to get json by making HTTP call

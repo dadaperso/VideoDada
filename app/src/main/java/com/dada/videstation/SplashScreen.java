@@ -64,6 +64,8 @@ public class SplashScreen extends Activity {
 
         api.updateWatch();
 
+        api.updatePoster();
+
 
     }
 }
