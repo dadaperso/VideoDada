@@ -17,6 +17,7 @@ import com.dada.videstation.model.Genre;
 import com.dada.videstation.model.Item;
 import com.dada.videstation.model.Mapper;
 import com.dada.videstation.model.Movie;
+import com.dada.videstation.model.Poster;
 import com.dada.videstation.model.Summary;
 import com.dada.videstation.model.TvZod;
 import com.dada.videstation.model.Tvshow;
@@ -49,7 +50,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
     private static final String TABLE_GENRE = "t_genre";
     private static final String TABLE_WATCH = "t_watch_status";
     private static final String TABLE_POSTER = "t_poster";
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 10;
 
     private boolean where = false;
 
@@ -182,8 +183,8 @@ public class DatabaseMedia extends SQLiteOpenHelper {
             db.execSQL("CREATE TABLE "+TABLE_POSTER+" ("+API.TAG_ID+" INTEGER PRIMARY KEY AUTOINCREMENT,"+
                     API.TAG_MAPPER_ID+" INT, "+API.TAG_LO_ID+" int, "+API.TAG_MD5+" TEXT, "+
                     API.TAG_CREATE_DATE+" DATETIME, "+API.TAG_MODIFY_DATE+" DATETIME)");
-        }else if (newVersion == 9 ){
-            db.execSQL("DROP TABLE "+TABLE_POSTER);
+        }else if (newVersion == 10 ){
+            db.execSQL("DROP TABLE IF EXISTS "+TABLE_POSTER);
             db.execSQL("CREATE TABLE "+TABLE_POSTER+" ("+API.TAG_ID+" INTEGER PRIMARY KEY AUTOINCREMENT,"+
                     API.TAG_MAPPER_ID+" INT, "+API.TAG_LO_ID+" int, "+API.TAG_MD5+" TEXT, "+
                     API.TAG_CREATE_DATE+" DATETIME, "+API.TAG_MODIFY_DATE+" DATETIME)");
@@ -548,35 +549,39 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         ArrayList<TvZod> lstZod = null;
 
         result.moveToFirst();
-        while (!result.isAfterLast()){
+        if (result.getCount() > 0)
+        {
 
-            if (currentSeason != result.getInt(4)){
-                if (currentSeason != 0){
-                    listZod.put(Integer.toString(currentSeason), lstZod);
-                    dataListSeason.add(Integer.toString(currentSeason) );
+
+            while (!result.isAfterLast()){
+
+                if (currentSeason != result.getInt(4)){
+                    if (currentSeason != 0){
+                        listZod.put(Integer.toString(currentSeason), lstZod);
+                        dataListSeason.add(Integer.toString(currentSeason) );
+                    }
+
+                    currentSeason = result.getInt(4);
+
+                    if (listZod.containsKey(currentSeason)){
+                        lstZod = listZod.get(currentSeason);
+                    }else {
+                        lstZod = new ArrayList<TvZod>();
+                    }
+
                 }
 
-                currentSeason = result.getInt(4);
+                TvZod tvZod = hydrateTvZod(result);
+                tvZod.setTvshow(tvshow);
 
-                if (listZod.containsKey(currentSeason)){
-                    lstZod = listZod.get(currentSeason);
-                }else {
-                    lstZod = new ArrayList<TvZod>();
-                }
+                lstZod.add(tvZod);
 
+                result.moveToNext();
             }
 
-            TvZod tvZod = hydrateTvZod(result);
-            tvZod.setTvshow(tvshow);
-
-            lstZod.add(tvZod);
-
-            result.moveToNext();
+            dataListSeason.add(Integer.toString(currentSeason));
+            listZod.put(Integer.toString(currentSeason), lstZod);
         }
-
-        dataListSeason.add(Integer.toString(currentSeason));
-        listZod.put(Integer.toString(currentSeason), lstZod);
-
 
         response[0] = dataListSeason;
         response[1] = listZod;
@@ -841,7 +846,7 @@ public class DatabaseMedia extends SQLiteOpenHelper {
     private int getMapperIdByEntityId(int id, String table) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String[] columns = {API.TAG_MAPPER_ID};
+        String[] columns = {API.TAG_ID};
         String where = "id=?";
         String[] whereArgs = {Integer.toString(id)};
         Cursor result = db.query(table, columns, where, whereArgs, null, null, null);
@@ -1060,5 +1065,42 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         }
 
         return lstItem;
+    }
+
+    public Poster getPosterByMapper(Mapper mapper) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] columns = {API.TAG_ID, API.TAG_MAPPER_ID, API.TAG_LO_ID, API.TAG_MD5,
+                            API.TAG_CREATE_DATE, API.TAG_MODIFY_DATE};
+        String where = API.TAG_MAPPER_ID+" = ?";
+        String[] whereArgs = {Integer.toString(mapper.getId())};
+        Cursor result = db.query(TABLE_POSTER, columns, where, whereArgs, null, null, null);
+
+        result.moveToFirst();
+
+        Poster poster = null;
+
+        while (!result.isAfterLast())
+        {
+            poster = this.hydratePoster(result);
+            poster.setMapper(mapper);
+
+            result.moveToNext();
+        }
+
+        return poster;
+    }
+
+    private Poster hydratePoster(Cursor result) {
+        Poster poster = new Poster();
+
+        poster.setId(result.getInt(0));
+        poster.setLo_oid(result.getInt(2));
+        poster.setMd5(result.getString(3));
+        poster.setCreateDate(StringConversion.stringToDate(result.getString(4)));
+        poster.setModifyDate(StringConversion.stringToDate(result.getString(5)));
+
+
+        return poster;
     }
 }

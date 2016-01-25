@@ -25,11 +25,14 @@ import android.widget.TextView;
 import com.dada.videstation.model.Actor;
 import com.dada.videstation.model.Genre;
 import com.dada.videstation.model.Movie;
+import com.dada.videstation.model.Poster;
 import com.dada.videstation.model.VideoFile;
 import com.dada.videstation.utils.API;
 import com.dada.videstation.utils.DatabaseMedia;
+import com.dada.videstation.utils.ServiceHandler;
 import com.dada.videstation.utils.StringConversion;
 import com.example.dada.res1.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -71,6 +74,7 @@ public class DetailMovieActivity2 extends AppCompatActivity
 
         mVideoFile = dbMedia.getVideoFileByMapper(movie.getMapper());
 
+        Poster mPoster = dbMedia.getPosterByMapper(movie.getMapper());
 
         Point size = new Point();
         getWindowManager().getDefaultDisplay().getSize(size);
@@ -113,7 +117,10 @@ public class DetailMovieActivity2 extends AppCompatActivity
         GridLayout.LayoutParams two = new GridLayout.LayoutParams(row2a6, col0);
         two.width = tiersScreenWidth;
         two.height = sixOfQuaterHeight*5;
+
         ImageView imgAffiche = (ImageView) findViewById(R.id.imgAfficheFiche);
+        if(mPoster != null)
+            Picasso.with(this).load(ServiceHandler.API_URL+"/poster/"+mPoster.getLo_oid()+".jpeg").into(imgAffiche);
         imgAffiche.setLayoutParams(two);
         // TODO implement poster table
 
@@ -223,7 +230,11 @@ public class DetailMovieActivity2 extends AppCompatActivity
         seven.height = sixOfQuaterHeight;
         TextView txtDuration = (TextView) findViewById(R.id.txtDureeFiche);
         txtDuration.setLayoutParams(seven);
-        String duration = StringConversion.timeConversion(mVideoFile.getDuration());
+        String duration = "00:00";
+        if (mVideoFile != null){
+            duration = StringConversion.timeConversion(mVideoFile.getDuration());
+        }
+
         txtDuration.setText(String.format(getResources().getString(
                 R.string.locdvd_movie_duration), duration));
 

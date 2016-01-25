@@ -17,17 +17,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.dada.videstation.model.Actor;
 import com.dada.videstation.model.Genre;
+import com.dada.videstation.model.Poster;
 import com.dada.videstation.model.TvZod;
 import com.dada.videstation.model.VideoFile;
 import com.dada.videstation.utils.API;
 import com.dada.videstation.utils.DatabaseMedia;
+import com.dada.videstation.utils.ServiceHandler;
 import com.dada.videstation.utils.StringConversion;
 import com.example.dada.res1.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -73,6 +77,11 @@ public class DetailTvZodActivity extends AppCompatActivity
         // TODO add style to text
         TextView txtZodTitle = (TextView) findViewById(R.id.txtTvZodTitle);
         txtZodTitle.setText(zod.getTagLine());
+
+        ImageView ivAfficheZod = (ImageView) findViewById(R.id.imgTvZodImage);
+        Poster poster = DatabaseMedia.getInstance(this).getPosterByMapper(zod.getMapper());
+        if (poster != null)
+            Picasso.with(this).load(ServiceHandler.API_URL + "/poster/" + poster.getLo_oid() + ".jpeg").into(ivAfficheZod);
 
         TextView txtTvZodSeason = (TextView) findViewById(R.id.txtTvZodSeason);
         Resources res = getResources();

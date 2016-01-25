@@ -20,22 +20,21 @@ import java.util.HashMap;
 public class TvShowZodAdapter extends BaseExpandableListAdapter {
 
     private Context _context;
-    private ArrayList<String> _listDataHeader; // header titles
+    private ArrayList<String> _listSeason; // header titles (Saison )
     // child data in format of header title, child title
-    private HashMap<String, ArrayList<TvZod>> _listDataChild;
+    private HashMap<String, ArrayList<TvZod>> _listZod;
 
 
     public TvShowZodAdapter(Context context, ArrayList<String> listDataHeader,
                             HashMap<String, ArrayList<TvZod>> listChildData) {
         this._context = context;
-        this._listDataHeader = listDataHeader;
-        this._listDataChild = listChildData;
+        this._listSeason = listDataHeader;
+        this._listZod = listChildData;
     }
 
     @Override
     public TvZod getChild(int groupPosition, int childPosititon) {
-        return this._listDataChild.get(this._listDataHeader.get(groupPosition))
-                .get(childPosititon);
+        return this._listZod.get(this.getGroup(groupPosition)).get(childPosititon);
     }
 
     @Override
@@ -65,17 +64,21 @@ public class TvShowZodAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        return this._listDataChild.get(this._listDataHeader.get(groupPosition)).size();
+        //
+        if (this._listZod.get(this.getGroup(groupPosition)) != null)
+                return this._listZod.get(this.getGroup(groupPosition)).size();
+        else
+            return 0;
     }
 
     @Override
     public String getGroup(int groupPosition) {
-        return this._listDataHeader.get(groupPosition);
+        return this._listSeason.get(groupPosition);
     }
 
     @Override
     public int getGroupCount() {
-        return this._listDataHeader.size();
+        return this._listSeason.size();
     }
 
     @Override

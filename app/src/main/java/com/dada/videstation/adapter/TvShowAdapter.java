@@ -11,10 +11,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dada.videstation.DetailTvShowActivity;
+import com.dada.videstation.model.Poster;
 import com.dada.videstation.model.Tvshow;
 import com.dada.videstation.model.ViewHolder;
+import com.dada.videstation.utils.DatabaseMedia;
+import com.dada.videstation.utils.ServiceHandler;
 import com.dada.videstation.utils.StringConversion;
 import com.example.dada.res1.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -55,7 +59,9 @@ public class TvShowAdapter extends ArrayAdapter<Tvshow> {
 
         holder.txtReleaseDate.setText(StringConversion.dateToString(tvshow.getReleaseDate()));
 
-        //holder.imgAffiche.setImageResource(film.getiImg());
+        Poster poster = (Poster) DatabaseMedia.getInstance(_context).getPosterByMapper(tvshow.getMapper());
+        if (poster != null)
+            Picasso.with(_context).load(ServiceHandler.API_URL + "/poster/" + poster.getLo_oid() + ".jpeg").into(holder.imgAffiche);
 
         //Now get the id or whatever needed
         result.setId(position);

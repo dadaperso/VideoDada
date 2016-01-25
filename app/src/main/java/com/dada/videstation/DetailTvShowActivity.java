@@ -22,12 +22,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.dada.videstation.adapter.TvShowZodAdapter;
+import com.dada.videstation.model.Poster;
 import com.dada.videstation.model.TvZod;
 import com.dada.videstation.model.Tvshow;
 import com.dada.videstation.utils.API;
 import com.dada.videstation.utils.DatabaseMedia;
+import com.dada.videstation.utils.ServiceHandler;
 import com.dada.videstation.utils.StringConversion;
 import com.example.dada.res1.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,6 +96,10 @@ public class DetailTvShowActivity extends AppCompatActivity
         twoByTwo1.setLayoutParams(first);
         twoByTwo1.setBackgroundColor(Color.BLUE);
 
+        Poster poster = DatabaseMedia.getInstance(this).getPosterByMapper(tvshow.getMapper());
+        if (poster != null)
+            Picasso.with(this).load(ServiceHandler.API_URL + "/poster/" + poster.getLo_oid() + ".jpeg").into(twoByTwo1);
+
 
 
         TextView txtReleaseDate = (TextView) findViewById(R.id.txtDateSortieFiche);
@@ -147,7 +154,8 @@ public class DetailTvShowActivity extends AppCompatActivity
                 return true;
             }
         });
-        listTvZod.expandGroup(0);
+        if(adapter.getGroupCount()>0)
+            listTvZod.expandGroup(0);
 
     }
 
