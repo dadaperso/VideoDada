@@ -24,6 +24,7 @@ public class ServiceHandler {
     private static final String USER_AGENT = "Mozilla/5.0";
 
     public static final String API_URL = "http://pc-dada.home/api-locdvd";
+//    public static final String API_URL = "http://api-videodada.dadalnas.synology.me";
     private Context context;
 
     public ServiceHandler(Context ctx) {
