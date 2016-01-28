@@ -66,7 +66,7 @@ public class ServiceHandler {
                 OutputStream os = con.getOutputStream();
 
                 String urlParams = "{\"ids\":"+params.get("ids").toString()+"}";
-
+                Log.d("ServiceHandler POST", urlParams);
                 os.write(urlParams.getBytes());
                 os.flush();
                 os.close();

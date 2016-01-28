@@ -36,9 +36,6 @@ import java.util.HashMap;
 public class DatabaseMedia extends SQLiteOpenHelper {
 
 
-    private static DatabaseMedia mInstance;
-    Context context;
-
     private static final String DATABASE_NAME = "dbMedia.db";
     private static final String TABLE_MOVIE = "t_movie";
     private static final String TABLE_VIDEO_FILE = "t_video_file";
@@ -51,9 +48,19 @@ public class DatabaseMedia extends SQLiteOpenHelper {
     private static final String TABLE_WATCH = "t_watch_status";
     private static final String TABLE_POSTER = "t_poster";
     private static final int DATABASE_VERSION = 10;
-
+    private static DatabaseMedia mInstance;
+    Context context;
     private boolean where = false;
 
+
+    public DatabaseMedia(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
+        this.context = context;
+
+        Log.d("PATH DB", (context.getDatabasePath(this.getDatabaseName()).getAbsolutePath()));
+
+    }
 
     public static DatabaseMedia getInstance(Context ctx) {
 
@@ -65,15 +72,6 @@ public class DatabaseMedia extends SQLiteOpenHelper {
 
         }
         return mInstance;
-    }
-
-    public DatabaseMedia(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-
-        this.context = context;
-
-        Log.d("PATH DB", (context.getDatabasePath(this.getDatabaseName()).getAbsolutePath()));
-
     }
 
     public void onCreate(SQLiteDatabase db) {
@@ -788,12 +786,15 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
 
         String mapperIds = "";
+        String ids = "";
 
         for (int i=0;i<data.length();i++){
             try {
                 mapperIds += Integer.toString(this.getMapperIdByEntityId((int)data.get(i),table));
+                ids += Integer.toString((data.getInt(i)));
                 if (i != data.length()-1){
                     mapperIds+=",";
+                    ids+=";";
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -801,47 +802,25 @@ public class DatabaseMedia extends SQLiteOpenHelper {
         }
 
 
-        String   whereArg = mapperIds;
-        String   where = "mapper_id IN ("+whereArg+")";
-        String   whereMapper = "id IN ("+whereArg+")";
-
-        Log.d("delteData", "delete from " + table + " where mapper_id IN (" + whereArg + ")");
-
-        // debut transaction for delete child of Entity
-
-        try{
-            db.beginTransaction();
-
-            //delelte genre, actor, summary, mapper, videofile MAPPER_ID ?
-            int resultG = db.delete(TABLE_GENRE, where,null);
-            Log.d("delteData", "delete from " + TABLE_GENRE + " where mapper_id IN (" + whereArg + ")");
-            Log.d("delteData", "result:" + resultG + " row affected");
-            int resultA = db.delete(TABLE_ACTOR, where, null);
-            Log.d("delteData", "delete from " + TABLE_ACTOR + " where mapper_id IN (" + whereArg + ")");
-            Log.d("delteData", "result:" + resultA + " row affected");
-            int resultS = db.delete(TABLE_SUMMARY, where, null);
-            Log.d("delteData", "delete from " + TABLE_SUMMARY + " where mapper_id IN (" + whereArg + ")");
-            Log.d("delteData", "result:" + resultS + " row affected");
-            int resultV = db.delete(TABLE_VIDEO_FILE, where, null);
-            Log.d("delteData", "delete from " + TABLE_VIDEO_FILE + " where mapper_id IN (" + whereArg + ")");
-            Log.d("delteData", "result:" + resultV + " row affected");
-            int resultE = db.delete(table, where, null);
-            Log.d("delteData", "delete from " + table + " where mapper_id IN (" + whereArg + ")");
-            Log.d("delteData", "result:" + resultE + " row affected");
-            int resultMap = db.delete(TABLE_MAPPER, whereMapper, null);
-            Log.d("delteData", "delete from " + TABLE_MAPPER + " where id IN (" + whereArg + ")");
-            Log.d("delteData", "result:" + resultMap+" row affected");
-
-            db.setTransactionSuccessful();
-
-        }catch (SQLiteException e){
-            e.printStackTrace();
-        }finally{
-            db.endTransaction();
+        String where;
+        // TABLE_SUMMARY, TABLE_POSTER, TABLE_VIDEO_FILE, TABLE_TVSHOW, TABLE_WATCH_STATUS,
+        // TABLE_MOVIE, TABLE_TVZOD
+        if (table.equals(TABLE_MAPPER) || !table.equals(TABLE_ACTOR) || !table.equals(TABLE_GENRE)) {
+           where = "mapper_id IN (" + mapperIds + ")";
+        }
+        else // TABLE_
+        {
+           where = "id IN ("+ ids +")";
         }
 
-
-    }
+        try{
+            int resultE = db.delete(table, where, null);
+            Log.d("delteData", "delete from " + table + " "+ where);
+            Log.d("delteData", "result:" + resultE + " row affected");
+        }catch (SQLiteException e){
+            e.printStackTrace();
+        }
+   }
 
     private int getMapperIdByEntityId(int id, String table) {
         SQLiteDatabase db = this.getReadableDatabase();
